@@ -3,12 +3,7 @@ home_ui <- function(id) {
   ns <- NS(id)
   
   tagList(
-    fluidRow(
-      column(width = 12, 
-             tags$h1('Explore CVPIA Model Inputs'), 
-             tags$p('Expl.... text of what do here'))
-      
-    ),
+    # TODO create modal to welcome and describe the app
     fluidRow(
       column(width = 2, 
              selectInput(ns('region'), 'Select Region', 
@@ -26,7 +21,11 @@ home_ui <- function(id) {
              uiOutput(ns('data_type_name')))
     ),
     fluidRow(
-      column(width = 12)
+      column(width = 3, 
+             tags$h5("Summary Statistics"),
+             tableOutput(ns('summary_stats'))),
+      column(width = 9, 
+             plotlyOutput(ns('time_series_plot')))
     )
   )
   
@@ -35,8 +34,6 @@ home_ui <- function(id) {
 home_server <- function(input, output, session) {
   
   ns <- session$ns
-  
-  
   
   output$data_type_input_ui <- renderUI({
     
@@ -64,6 +61,44 @@ home_server <- function(input, output, session) {
              'More info')
     )
   })
+  
+  # output_df <- reactive({
+  #   if (input$category == 'Flow') {
+  #     
+  #     tmp <- switch(input$data_type, 
+  #            '1' = cvpiaFlow::flows_cfs, 
+  #            '2' = cvpiaFlow::bypass_flows, 
+  #            '3' = cvpiaFlow::delta_flows)
+  #     
+  #   } else if (input$category == 'Temperature') {
+  #     
+  #     tmp <- switch(input$data_type, 
+  #                   '4' = cvpiaTemperature::juv_temp, 
+  #                   '5' = cvpiaTemperature::delta_temps, 
+  #                   '6' = cvpiaTemperature::deg_days)
+  #     
+  #   } else {
+  #     
+  #   }
+  # })
+  # 
+  
+  output$summary_stats <- renderTable({
+    df %>% 
+      pull(monthly_mean_temp_c) %>% 
+      summary() %>% 
+      broom::tidy() %>% 
+      gather(stat, value)
+  }, colnames = FALSE)
+  
+  
+  output$time_series_plot <- renderPlotly({
+    df %>% 
+      plot_ly(x=~date, y=~monthly_mean_temp_c, type='scatter', mode='lines')
+  })
+  
+  
+  
   
   
 }

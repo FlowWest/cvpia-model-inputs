@@ -5,7 +5,7 @@ shinyUI(
     collapsible = TRUE,
     windowTitle = "CVPIA Model Inputs",
     theme = shinytheme(theme = 'readable'),
-    tabPanel('Home', home_ui('app')),
+    tabPanel('Explore CVPIA Model Inputs', home_ui('app')),
     tabPanel('About', about_ui('app'))
   )
 )

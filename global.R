@@ -1,6 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(shinycssloaders)
+library(plotly)
 
 library(tidyverse)
 
@@ -17,5 +18,8 @@ metadata_lookup <- expand.grid(region = letters[1:8],
                                metadata_link = c('cat.com', 'dog.com'), 
                                metadata_description = c('blah 1', 
                                                         'blah 2'))
+
+df <- cvpiaTemperature::delta_temps %>% 
+  filter(watershed == 'North Delta')
 
 
