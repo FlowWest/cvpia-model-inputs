@@ -8,3 +8,6 @@ library(cvpiaHabitat)
 library(cvpiaFlow)
 library(cvpiaTemperature)
 
+source('modules/about.R')
+source('modules/home.R')
+
