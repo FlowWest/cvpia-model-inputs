@@ -1,4 +1,14 @@
 region,category,data_type,metadata_description,metadata_link,name_in_package
 watershed,Temperature,Monthly Mean Temperature,,,juv_temp
-delta,Temperature,Monthly Mean Temperature,,,
-bypass,Temperature,Monthly Mean Temperature,,,
+delta,Temperature,Monthly Mean Temperature,,,dlt_temps
+bypass,Temperature,Monthly Mean Temperature,,,juv_temp
+watershed,Flow,Monthly Mean Flow,,,flow_cfs
+delta,Flow,Monthly Mean Flow,,,delta_flows
+bypass,Flow,Monthly Mean Flow,,,flow_cfs
+watershed,Flow,Monthly Mean Diverted,,,total_diverted
+delta,Flow,Monthly Mean Diverted,,,delta_flows
+watershed,,Monthly Mean Proportion Diverted,,,proportion_diverted
+bypass,,Monthly Mean Proportion Diverted,,,proportion_diverted
+watershed,Habitat,,,,fr_fp
+delta,Habitat,,,,
+bypass,Habitat,,,,
