@@ -1,5 +1,4 @@
 shinyUI(
-  
   navbarPage(
     title = div(img(src="lamp.png"), NULL), 
     header = includeCSS("www/styles.css"),
