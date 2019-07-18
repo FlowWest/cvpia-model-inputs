@@ -1,0 +1,4 @@
+region,category,data_type,metadata_description,metadata_link,name_in_package
+watershed,Temperature,Monthly Mean Temperature,,,juv_temp
+delta,Temperature,Monthly Mean Temperature,,,
+bypass,Temperature,Monthly Mean Temperature,,,

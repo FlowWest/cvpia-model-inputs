@@ -8,11 +8,12 @@ library(tidyverse)
 library(cvpiaHabitat)
 library(cvpiaFlow)
 library(cvpiaTemperature)
+library(cvpiaData)
 
 source('modules/about.R')
 source('modules/home.R')
 
-metadata_lookup <- expand.grid(region = letters[1:8], 
+metadata_lookup <- expand.grid(region = cvpiaData::watershed_ordering$watershed, 
                                category = c('Flow', 'Temperature', 'Habitat'), 
                                data_type = c(1, 2, 4, 5, 8, 9), 
                                metadata_link = c('cat.com', 'dog.com'), 
