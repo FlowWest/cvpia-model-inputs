@@ -1,3 +1,7 @@
+library(tidyverse)
+library(lubridate)
+library(stringr)
+
 # repeat for all of the habitat arrays
 
 # HABITAT ======================================================================
@@ -31,7 +35,7 @@ sr_fp_habitat <- map_df(1:20, function(i) {
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
   mutate(month = str_extract(month, "[0-9]+"), 
-         spcies = "Spring Run")
+         species = "Spring Run")
 
 st_fp_habitat <- map_df(1:20, function(i) {
   cvpiaData::st_fp[,,i] %>% 
@@ -48,7 +52,11 @@ floodplain_habitat <- bind_rows(
   wr_fp_habitat, 
   sr_fp_habitat, 
   st_fp_habitat
-)
+) %>% 
+  mutate(date = ymd(paste(year, month, 1, sep = '-')),
+         value = ifelse(str_detect(watershed, 'Sacramento'), sqm/4046.86, sqm/4046.86*.27)) # suitable acres
+
+write_rds(floodplain_habitat, 'data/floodplain_habitat.rds')
 
 # Monthly spawning rearing habitat ---------------------------------------------
 
