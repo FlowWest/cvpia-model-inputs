@@ -1,6 +1,6 @@
 # repeat for all of the habitat arrays
 
-# Monthly floodplain rearing habitat
+# Monthly floodplain rearing habitat -------------------------------------------
 fr_fp_habitat <- map_df(1:20, function(i) {
   cvpiaData::fr_fp[,,i] %>% 
     as.data.frame() %>% 
@@ -51,10 +51,162 @@ floodplain_habitat <- bind_rows(
 
 
 
-# Monthly spawning rearing habitat
-?cvpiaData::sr_fp
+# Monthly spawning rearing habitat ---------------------------------------------
 
-# Monthly rearing area
+fr_spawn_habitat <- map_df(1:20, function(i) {
+  cvpiaData::fr_spawn[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Fall Run")
+
+sr_spawn_habitat <- map_df(1:20, function(i) {
+  cvpiaData::sr_spawn[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Spring Run")
+
+wr_spawn_habitat <- map_df(1:20, function(i) {
+  cvpiaData::wr_spawn[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Winter Run")
+
+st_spawn_habitat <- map_df(1:20, function(i) {
+  cvpiaData::st_spawn[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Steelhead")
+
+monthly_spawning_habitat <- bind_rows(
+  fr_spawn_habitat, 
+  wr_spawn_habitat,
+  sr_spawn_habitat, 
+  st_spawn_habitat
+)
+
+# Monthly fry inchannel --------------------------------------------------------
+
+fr_fry_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::fr_fry[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Fall Run")
+
+
+sr_fry_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::sr_fry[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Spring Run")
+
+
+wr_fry_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::wr_fry[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Winter Run")
+
+
+st_fry_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::st_fry[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Steelhead")
+
+fry_inchannel_habitat <- bind_rows(
+  fr_fry_inchannel_habitat, 
+  wr_fry_inchannel_habitat,
+  sr_fry_inchannel_habitat,
+  st_fry_inchannel_habitat
+)
+
+# Monthly Juvenile Rearing habitat ---------------------------------------------
+
+fr_juv_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::fr_juv[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Fall Run")
+
+
+sr_juv_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::sr_juv[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Spring Run")
+
+
+wr_juv_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::wr_juv[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Winter Run")
+
+
+st_juv_inchannel_habitat <- map_df(1:20, function(i) {
+  cvpiaData::st_juv[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+}) %>% 
+  gather(month, sqm, -watershed, -year) %>% 
+  mutate(month = str_extract(month, "[0-9]+"), 
+         species = "Steelhead")
+
+
+juv_inchannel_habitat <- bind_rows(
+  fr_juv_inchannel_habitat, 
+  wr_juv_inchannel_habitat,
+  sr_juv_inchannel_habitat,
+  st_juv_inchannel_habitat
+)
+
+
+
 
 
 
