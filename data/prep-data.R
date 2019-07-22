@@ -1,5 +1,7 @@
 # repeat for all of the habitat arrays
 
+# HABITAT ======================================================================
+
 # Monthly floodplain rearing habitat -------------------------------------------
 fr_fp_habitat <- map_df(1:20, function(i) {
   cvpiaData::fr_fp[,,i] %>% 
@@ -31,7 +33,6 @@ sr_fp_habitat <- map_df(1:20, function(i) {
   mutate(month = str_extract(month, "[0-9]+"), 
          spcies = "Spring Run")
 
-
 st_fp_habitat <- map_df(1:20, function(i) {
   cvpiaData::st_fp[,,i] %>% 
     as.data.frame() %>% 
@@ -48,8 +49,6 @@ floodplain_habitat <- bind_rows(
   sr_fp_habitat, 
   st_fp_habitat
 )
-
-
 
 # Monthly spawning rearing habitat ---------------------------------------------
 
@@ -134,7 +133,6 @@ wr_fry_inchannel_habitat <- map_df(1:20, function(i) {
   mutate(month = str_extract(month, "[0-9]+"), 
          species = "Winter Run")
 
-
 st_fry_inchannel_habitat <- map_df(1:20, function(i) {
   cvpiaData::st_fry[,,i] %>% 
     as.data.frame() %>% 
@@ -163,7 +161,6 @@ fr_juv_inchannel_habitat <- map_df(1:20, function(i) {
   gather(month, sqm, -watershed, -year) %>% 
   mutate(month = str_extract(month, "[0-9]+"), 
          species = "Fall Run")
-
 
 sr_juv_inchannel_habitat <- map_df(1:20, function(i) {
   cvpiaData::sr_juv[,,i] %>% 
@@ -229,6 +226,38 @@ juv_inchannel_habitat <- bind_rows(
 
 
 
+
+
+
+
+
+
+# FLOW =========================================================================
+
+# monthly mean flow 
+watershed_and_watershed_flows <- 
+  cvpiaFlow::flows_cfs %>% 
+  gather(watershed, flow_cfs, -date)
+
+delta_flows <- cvpiaFlow::delta_flows %>% 
+  gather(delta_flow_type, flow_cfs, -date)
+
+# monthly mean diverted 
+
+watershed_monthly_mean_diverted <- 
+  cvpiaFlow::total_diverted %>% 
+  gather(watershed, total_diverted, -date)
+
+delta_monthly_mean_diverted <- 
+  cvpiaFlow::delta_flows %>% 
+  select(date, s_dlt_div_cfs, n_dlt_div_cfs) %>% 
+  gather(delta_region, total_diverted_cfs, -date)
+
+# monthly mean proportion diverted
+
+
+
+# TEMPERATURE ==================================================================
 
 
 
