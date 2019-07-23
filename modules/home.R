@@ -5,13 +5,13 @@ home_ui <- function(id) {
   tagList(
     # TODO create modal to welcome and describe the app
     fluidRow(
-      column(width = 2, 
+      column(width = 4, 
              selectInput(ns('region'), 'Select Region', 
                          choices = c(cvpiaData::watershed_ordering$watershed, 'North Delta', 'South Delta'))),
-      column(width = 2,
+      column(width = 4,
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
-      column(width = 2,
+      column(width = 4,
              uiOutput(ns('data_type_input_ui')))
       
     ),
@@ -37,10 +37,16 @@ home_server <- function(input, output, session) {
   
   output$data_type_input_ui <- renderUI({
     
-    option <- switch(input$category, 
-                     'Flow' = c(1, 2, 3), 
-                     'Temperature' = 4:6, 
-                     'Habitat' = 7:9)
+    if (input$category == 'Habitat') {
+      selected_region <- input$region
+    } else {
+      selected_region <- ifelse(input$region == 'delta', 'delta', 'watershed')
+    }
+    
+    option <- metadata_lookup %>% 
+      filter(region == selected_region, category == input$category) %>% 
+      pull(data_type) %>% 
+      unique()
     
     selectInput(ns('data_type'), 'Select Data Type', 
                 choices = option)
