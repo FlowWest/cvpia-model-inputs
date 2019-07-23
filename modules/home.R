@@ -35,21 +35,34 @@ home_server <- function(input, output, session) {
   
   ns <- session$ns
   
+  category_choices <- reactive({
+    switch(input$category, 
+           'Flow' = c("Monthly Mean Flow", 
+                      "Monthly Mean Diverted", 
+                      "Monthly Mean Proportion Diverted"), 
+           'Temperature' = c("Monthly Mean Temperature", "Degree Days"), 
+           'Habitat' = c("Monthly In-channel Rearing Area", 
+                         "Monthly Rearing Area",
+                         "Monthly Floodplain Rearing Area", 
+                         "Monthly Spawning Rearing Area"))
+    
+  })
+  
   output$data_type_input_ui <- renderUI({
-    
-    option <- switch(input$category, 
-                     'Flow' = c(1, 2, 3), 
-                     'Temperature' = 4:6, 
-                     'Habitat' = 7:9)
-    
-    selectInput(ns('data_type'), 'Select Data Type', 
-                choices = option)
+
+        selectInput(ns('data_type'), 'Select Data Type', 
+                choices = category_choices())
   })
   
   output$region_name <- renderUI({
     tags$h3(input$region)
   }) 
+  
+  
   output$data_type_name <- renderUI({
+    
+    req(input$data_type)
+    
     description <- metadata_lookup %>% 
       filter(region == input$region, 
              category == input$category, 
@@ -62,26 +75,6 @@ home_server <- function(input, output, session) {
     )
   })
   
-  # output_df <- reactive({
-  #   if (input$category == 'Flow') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #            '1' = cvpiaFlow::flows_cfs, 
-  #            '2' = cvpiaFlow::bypass_flows, 
-  #            '3' = cvpiaFlow::delta_flows)
-  #     
-  #   } else if (input$category == 'Temperature') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #                   '4' = cvpiaTemperature::juv_temp, 
-  #                   '5' = cvpiaTemperature::delta_temps, 
-  #                   '6' = cvpiaTemperature::deg_days)
-  #     
-  #   } else {
-  #     
-  #   }
-  # })
-  # 
   
   output$summary_stats <- renderTable({
     df %>% 
