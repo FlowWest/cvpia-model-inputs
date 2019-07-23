@@ -13,14 +13,10 @@ library(cvpiaData)
 source('modules/about.R')
 source('modules/home.R')
 
-metadata_lookup <- expand.grid(region = cvpiaData::watershed_ordering$watershed, 
-                               category = c('Flow', 'Temperature', 'Habitat'), 
-                               data_type = c(1, 2, 4, 5, 8, 9), 
-                               metadata_link = c('cat.com', 'dog.com'), 
-                               metadata_description = c('blah 1', 
-                                                        'blah 2'))
+metadata_lookup <- read_csv('data/metadata-lookup.csv')
 
 df <- cvpiaTemperature::delta_temps %>% 
   filter(watershed == 'North Delta')
 
-
+# category data frames
+habitat <- read_rds('data/habitat.rds')
