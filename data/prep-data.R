@@ -327,20 +327,29 @@ write_rds(flows, "data/flows.rds")
 # watershed 
 watershed_and_bypass_temperatures <- 
   cvpiaTemperature::juv_temp %>% 
-  mutate(date_type = "Monthly Mean Temperature") %>% 
-  select(date, watershed, value = monthly_mean_temp_c, date_type)
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, data_type)
   
 
 # delta 
 delta_temperatures <- 
   cvpiaTemperature::delta_temps %>% 
-  mutate(date_type = "Monthly Mean Temperature") %>% 
-  select(date, watershed, value = monthly_mean_temp_c, date_type)
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, data_type)
 
 # degree days ---------------------
 degree_days <- cvpiaTemperature::deg_days %>%
   select(date, watershed, value = degdays) %>% 
   mutate(data_type = "Degree Days")
+
+
+temperatures <- bind_rows(
+  watershed_and_bypass_temperatures, 
+  delta_temperatures, 
+  degree_days
+)
+
+write_rds(temperatures, "data/temperatures.rds")
 
 # migratory corridor water temperature ---------------
 # leave this one out for now
