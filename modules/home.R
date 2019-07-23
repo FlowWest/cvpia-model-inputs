@@ -35,16 +35,18 @@ home_server <- function(input, output, session) {
   
   ns <- session$ns
   
+  selected_region <- reactive({
+    if (input$category == 'Habitat') {
+      input$region
+    } else {
+      ifelse(input$region == 'delta', 'delta', 'watershed')
+    }
+  })
+  
   output$data_type_input_ui <- renderUI({
     
-    if (input$category == 'Habitat') {
-      selected_region <- input$region
-    } else {
-      selected_region <- ifelse(input$region == 'delta', 'delta', 'watershed')
-    }
-    
     option <- metadata_lookup %>% 
-      filter(region == selected_region, category == input$category) %>% 
+      filter(region == selected_region(), category == input$category) %>% 
       pull(data_type) %>% 
       unique()
     
@@ -55,9 +57,10 @@ home_server <- function(input, output, session) {
   output$region_name <- renderUI({
     tags$h3(input$region)
   }) 
+  
   output$data_type_name <- renderUI({
     description <- metadata_lookup %>% 
-      filter(region == input$region, 
+      filter(region == selected_region(), 
              category == input$category, 
              data_type == input$data_type)
     tagList(
@@ -67,27 +70,6 @@ home_server <- function(input, output, session) {
              'More info')
     )
   })
-  
-  # output_df <- reactive({
-  #   if (input$category == 'Flow') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #            '1' = cvpiaFlow::flows_cfs, 
-  #            '2' = cvpiaFlow::bypass_flows, 
-  #            '3' = cvpiaFlow::delta_flows)
-  #     
-  #   } else if (input$category == 'Temperature') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #                   '4' = cvpiaTemperature::juv_temp, 
-  #                   '5' = cvpiaTemperature::delta_temps, 
-  #                   '6' = cvpiaTemperature::deg_days)
-  #     
-  #   } else {
-  #     
-  #   }
-  # })
-  # 
   
   output$summary_stats <- renderTable({
     df %>% 
