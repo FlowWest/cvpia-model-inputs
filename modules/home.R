@@ -44,6 +44,13 @@ home_server <- function(input, output, session) {
     }
   })
   
+  y_axis_label <- reactive({
+    metadata_lookup %>% 
+      filter(region == selected_region(), data_type == input$data_type) %>% 
+      pull(y_axis_label) %>% 
+      unique()
+  })
+  
   selected_dataset <- reactive({
     df <- switch(input$category,
                  'Habitat' = habitat,
@@ -108,7 +115,9 @@ home_server <- function(input, output, session) {
   
   output$time_series_plot <- renderPlotly({
     selected_dataset() %>% 
-      plot_ly(x=~date, y=~value, type='scatter', mode='lines')
+      plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
+      layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
+      config(displayModeBar = FALSE)
   })
   
   
