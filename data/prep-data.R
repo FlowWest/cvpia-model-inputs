@@ -351,8 +351,6 @@ temperatures <- bind_rows(
 
 write_rds(temperatures, "data/temperatures.rds")
 
-# migratory corridor water temperature ---------------
-# leave this one out for now
 
 
 
