@@ -12,7 +12,9 @@ home_ui <- function(id) {
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
       column(width = 2,
-             uiOutput(ns('data_type_input_ui')))
+             uiOutput(ns('data_type_input_ui'))), 
+      column(width = 4, 
+             uiOutput(ns('habitat_species_ui')))
       
     ),
     fluidRow(
@@ -41,14 +43,14 @@ home_server <- function(input, output, session) {
     # based on the category chosen return the appropriate 
     # vector of the data_type choices
     data_type_choices <- switch(input$category, 
-           'Flow' = c("Monthly Mean Flow", 
-                      "Monthly Mean Diverted", 
-                      "Monthly Mean Proportion Diverted"), 
-           'Temperature' = c("Monthly Mean Temperature", "Degree Days"), 
-           'Habitat' = c("Monthly In-channel Rearing Area", 
-                         "Monthly Rearing Area",
-                         "Monthly Floodplain Rearing Area", 
-                         "Monthly Spawning Rearing Area"))
+           'Flow' = c('Monthly Mean Flow', 
+                      'Monthly Mean Diverted', 
+                      'Monthly Mean Proportion Diverted'), 
+           'Temperature' = c('Monthly Mean Temperature', 'Degree Days'), 
+           'Habitat' = c('Monthly In-channel Rearing Area', 
+                         'Monthly Rearing Area',
+                         'Monthly Floodplain Rearing Area', 
+                         'Monthly Spawning Rearing Area'))
 
         selectInput(ns('data_type'), 'Select Data Type', 
                 choices = data_type_choices)
@@ -57,6 +59,37 @@ home_server <- function(input, output, session) {
   output$region_name <- renderUI({
     tags$h3(input$region)
   }) 
+  
+  output$habitat_species_ui <- renderUI({
+    if (input$category == 'Habitat') {
+      radioButtons(ns('habitat_species'), 'Select Species', 
+                   choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'),
+                   inline = TRUE)
+    } else {
+      NULL
+    }
+    
+  })
+  
+  selected_data <- reactive({
+    switch(input$category, 
+           'Flow' = {
+             flow %>% 
+               filter(region == input$region, 
+                      data_type == input$data_type)
+           }, 
+           'Temperature' = {
+             temperature %>% 
+               filter(region == input$region, 
+                      data_type == input$data_type)
+           }, 
+           'Habitat' = {
+             habitat %>% 
+               flow %>% 
+               filter(region == input$region, 
+                      data_type == input$data_type)
+           })
+  })
   
   
   output$data_type_name <- renderUI({
