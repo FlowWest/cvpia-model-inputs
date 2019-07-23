@@ -259,30 +259,121 @@ write_rds(habitat, 'data/habitat.rds')
 
 # FLOW =========================================================================
 
-# monthly mean flow 
-watershed_and_watershed_flows <- 
+# monthly mean flow ---------------------------------
+
+watershed_and_bypass_flows <- 
   cvpiaFlow::flows_cfs %>% 
-  gather(watershed, flow_cfs, -date)
+  gather(watershed, flow_cfs, -date) %>% 
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, region = watershed, value = flow_cfs, data_type)
 
-delta_flows <- cvpiaFlow::delta_flows %>% 
-  gather(delta_flow_type, flow_cfs, -date)
+delta_flows <- 
+  cvpiaFlow::delta_flows %>% 
+  select(date, n_dlt_inflow_cfs, s_dlt_inflow_cfs) %>% 
+  gather(delta_flow_type, flow_cfs, -date) %>% 
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, region = delta_flow_type, value = flow_cfs, data_type)
 
-# monthly mean diverted 
+# monthly mean diverted --------------------------------
 
 watershed_monthly_mean_diverted <- 
   cvpiaFlow::total_diverted %>% 
-  gather(watershed, total_diverted, -date)
+  gather(watershed, total_diverted, -date) %>% 
+  mutate(data_type = "Monthly Mean Diverted") %>% 
+  select(date, region = watershed, value = total_diverted, data_type)
 
 delta_monthly_mean_diverted <- 
   cvpiaFlow::delta_flows %>% 
   select(date, s_dlt_div_cfs, n_dlt_div_cfs) %>% 
-  gather(delta_region, total_diverted_cfs, -date)
+  gather(watershed, total_diverted_cfs, -date) %>% 
+  mutate(data_type = "Monthly Mean Diverted") %>%
+  select(date, region = watershed, value = total_diverted_cfs, data_type)
 
-# monthly mean proportion diverted
+# monthly mean proportion diverted ----------------------
 
+# watershed 
+watershed_monthly_mean_prop_diverted <- 
+  cvpiaFlow::proportion_diverted %>% 
+  gather(watershed, proportion_diverted, -date) %>% 
+  mutate(data_type = "Monthly Mean Proportion Diverted") %>% 
+  select(date, region = watershed, value = proportion_diverted, 
+         data_type)
+
+# delta
+delta_monthly_mean_prop_diverted <- 
+  cvpiaFlow::delta_flows %>% 
+  select(date, s_dlt_prop_div, n_dlt_prop_div) %>% 
+  gather(watershed, proportion_diverted, -date) %>% 
+  mutate(data_type = "Monthly Mean Proportion Diverted") %>%
+  select(date, region = watershed, value = proportion_diverted, data_type)
+
+
+flows <- bind_rows(
+  watershed_and_bypass_flows, 
+  delta_flows, 
+  watershed_monthly_mean_diverted, 
+  delta_monthly_mean_diverted, 
+  watershed_monthly_mean_prop_diverted, 
+  delta_monthly_mean_prop_diverted
+)
+
+write_rds(flows, "data/flows.rds")
 
 
 # TEMPERATURE ==================================================================
+
+# monthly mean temp ----------------
+
+# watershed 
+watershed_and_bypass_temperatures <- 
+  cvpiaTemperature::juv_temp %>% 
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, data_type)
+  
+
+# delta 
+delta_temperatures <- 
+  cvpiaTemperature::delta_temps %>% 
+  mutate(data_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, data_type)
+
+# degree days ---------------------
+degree_days <- cvpiaTemperature::deg_days %>%
+  select(date, watershed, value = degdays) %>% 
+  mutate(data_type = "Degree Days")
+
+
+temperatures <- bind_rows(
+  watershed_and_bypass_temperatures, 
+  delta_temperatures, 
+  degree_days
+)
+
+write_rds(temperatures, "data/temperatures.rds")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
