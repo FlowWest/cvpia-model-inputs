@@ -234,15 +234,18 @@ juv_inchannel_habitat <- bind_rows(
 
 # FLOW =========================================================================
 
-# monthly mean flow 
+# monthly mean flow ---------------------------------
+
 watershed_and_watershed_flows <- 
   cvpiaFlow::flows_cfs %>% 
-  gather(watershed, flow_cfs, -date)
+  gather(watershed, flow_cfs, -date) %>% 
+  mutate(data_type = "Monthly Mean Temperature")
 
 delta_flows <- cvpiaFlow::delta_flows %>% 
-  gather(delta_flow_type, flow_cfs, -date)
+  select(date, n_dlt_inflow_cfs, s_dlt_inflow_cfs) %>% 
+  gather(delta_flow_type, flow_cfs, -date) 
 
-# monthly mean diverted 
+# monthly mean diverted --------------------------------
 
 watershed_monthly_mean_diverted <- 
   cvpiaFlow::total_diverted %>% 
@@ -251,13 +254,64 @@ watershed_monthly_mean_diverted <-
 delta_monthly_mean_diverted <- 
   cvpiaFlow::delta_flows %>% 
   select(date, s_dlt_div_cfs, n_dlt_div_cfs) %>% 
-  gather(delta_region, total_diverted_cfs, -date)
+  gather(watershed, total_diverted_cfs, -date)
 
-# monthly mean proportion diverted
+# monthly mean proportion diverted ----------------------
+
+# watershed 
+watershed_monthly_mean_prop_diverted <- 
+  cvpiaFlow::proportion_diverted %>% 
+  gather(watershed, proportion_diverted, -date)
+
+# delta
+delta_monthly_mean_prop_diverted <- 
+  cvpiaFlow::delta_flows %>% 
+  select(date, s_dlt_prop_div, n_dlt_prop_div) %>% 
+  gather(watershed, proportion_diverted, -date)
+
 
 
 
 # TEMPERATURE ==================================================================
+
+# monthly mean temp ----------------
+
+# watershed 
+watershed_and_bypass_temperatures <- 
+  cvpiaTemperature::juv_temp
+
+# delta 
+delta_temperatures <- 
+  cvpiaTemperature::delta_temps
+
+# degree days ---------------------
+degree_days <- cvpiaTemperature::deg_days %>%
+  select(date, watershed, `Degree Days` = degdays)
+
+# migratory corridor water temperature ---------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
