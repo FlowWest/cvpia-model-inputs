@@ -35,8 +35,12 @@ home_server <- function(input, output, session) {
   
   ns <- session$ns
   
-  category_choices <- reactive({
-    switch(input$category, 
+  
+  output$data_type_input_ui <- renderUI({
+    
+    # based on the category chosen return the appropriate 
+    # vector of the data_type choices
+    data_type_choices <- switch(input$category, 
            'Flow' = c("Monthly Mean Flow", 
                       "Monthly Mean Diverted", 
                       "Monthly Mean Proportion Diverted"), 
@@ -45,13 +49,9 @@ home_server <- function(input, output, session) {
                          "Monthly Rearing Area",
                          "Monthly Floodplain Rearing Area", 
                          "Monthly Spawning Rearing Area"))
-    
-  })
-  
-  output$data_type_input_ui <- renderUI({
 
         selectInput(ns('data_type'), 'Select Data Type', 
-                choices = category_choices())
+                choices = data_type_choices)
   })
   
   output$region_name <- renderUI({
