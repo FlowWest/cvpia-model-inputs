@@ -7,7 +7,7 @@ home_ui <- function(id) {
     fluidRow(
       column(width = 2, 
              selectInput(ns('region'), 'Select Region', 
-                         choices = cvpiaData::watershed_ordering$watershed)),
+                         choices = c(cvpiaData::watershed_ordering$watershed, 'North Delta', 'South Delta'))),
       column(width = 2,
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
