@@ -64,10 +64,10 @@ home_server <- function(input, output, session) {
              category == input$category, 
              data_type == input$data_type)
     tagList(
-      tags$p(description$data_type),
-      tags$p(description$metadata_description),
-      tags$a(href = description$metadata_link, target = '_blank', 
-             'More info')
+      tags$h4(description$data_type),
+      tags$p(description$metadata_description,
+             tags$a(href = description$metadata_link, target = '_blank', 
+                    'More info'))
     )
   })
   
