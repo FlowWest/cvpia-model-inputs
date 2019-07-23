@@ -261,11 +261,11 @@ write_rds(habitat, 'data/habitat.rds')
 
 # monthly mean flow ---------------------------------
 
-watershed_and_watershed_flows <- 
+watershed_and_bypass_flows <- 
   cvpiaFlow::flows_cfs %>% 
   gather(watershed, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Temperature") %>% 
-  select(date, region = watershed, value = flow_cfs)
+  select(date, region = watershed, value = flow_cfs, data_type)
 
 delta_flows <- 
   cvpiaFlow::delta_flows %>% 
@@ -294,15 +294,30 @@ delta_monthly_mean_diverted <-
 # watershed 
 watershed_monthly_mean_prop_diverted <- 
   cvpiaFlow::proportion_diverted %>% 
-  gather(watershed, proportion_diverted, -date)
+  gather(watershed, proportion_diverted, -date) %>% 
+  mutate(data_type = "Monthly Mean Proportion Diverted") %>% 
+  select(date, region = watershed, value = proportion_diverted, 
+         data_type)
 
 # delta
 delta_monthly_mean_prop_diverted <- 
   cvpiaFlow::delta_flows %>% 
   select(date, s_dlt_prop_div, n_dlt_prop_div) %>% 
-  gather(watershed, proportion_diverted, -date)
+  gather(watershed, proportion_diverted, -date) %>% 
+  mutate(data_type = "Monthly Mean Proportion Diverted") %>%
+  select(date, region = watershed, value = proportion_diverted, data_type)
 
 
+flows <- bind_rows(
+  watershed_and_bypass_flows, 
+  delta_flows, 
+  watershed_monthly_mean_diverted, 
+  delta_monthly_mean_diverted, 
+  watershed_monthly_mean_prop_diverted, 
+  delta_monthly_mean_prop_diverted
+)
+
+write_rds(flows, "data/flows.rds")
 
 
 # TEMPERATURE ==================================================================
@@ -311,15 +326,21 @@ delta_monthly_mean_prop_diverted <-
 
 # watershed 
 watershed_and_bypass_temperatures <- 
-  cvpiaTemperature::juv_temp
+  cvpiaTemperature::juv_temp %>% 
+  mutate(date_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, date_type)
+  
 
 # delta 
 delta_temperatures <- 
-  cvpiaTemperature::delta_temps
+  cvpiaTemperature::delta_temps %>% 
+  mutate(date_type = "Monthly Mean Temperature") %>% 
+  select(date, watershed, value = monthly_mean_temp_c, date_type)
 
 # degree days ---------------------
 degree_days <- cvpiaTemperature::deg_days %>%
-  select(date, watershed, `Degree Days` = degdays)
+  select(date, watershed, value = degdays) %>% 
+  mutate(data_type = "Degree Days")
 
 # migratory corridor water temperature ---------------
 # leave this one out for now
