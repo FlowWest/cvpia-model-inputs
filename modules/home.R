@@ -5,13 +5,13 @@ home_ui <- function(id) {
   tagList(
     # TODO create modal to welcome and describe the app
     fluidRow(
-      column(width = 2, 
+      column(width = 4, 
              selectInput(ns('region'), 'Select Region', 
-                         choices = cvpiaData::watershed_ordering$watershed)),
-      column(width = 2,
+                         choices = c(cvpiaData::watershed_ordering$watershed, 'North Delta', 'South Delta'))),
+      column(width = 4,
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
-      column(width = 2,
+      column(width = 4,
              uiOutput(ns('data_type_input_ui')))
       
     ),
@@ -35,12 +35,20 @@ home_server <- function(input, output, session) {
   
   ns <- session$ns
   
+  selected_region <- reactive({
+    if (input$category == 'Habitat') {
+      input$region
+    } else {
+      ifelse(input$region == 'delta', 'delta', 'watershed')
+    }
+  })
+  
   output$data_type_input_ui <- renderUI({
     
-    option <- switch(input$category, 
-                     'Flow' = c(1, 2, 3), 
-                     'Temperature' = 4:6, 
-                     'Habitat' = 7:9)
+    option <- metadata_lookup %>% 
+      filter(region == selected_region(), category == input$category) %>% 
+      pull(data_type) %>% 
+      unique()
     
     selectInput(ns('data_type'), 'Select Data Type', 
                 choices = option)
@@ -49,39 +57,19 @@ home_server <- function(input, output, session) {
   output$region_name <- renderUI({
     tags$h3(input$region)
   }) 
+  
   output$data_type_name <- renderUI({
     description <- metadata_lookup %>% 
-      filter(region == input$region, 
+      filter(region == selected_region(), 
              category == input$category, 
              data_type == input$data_type)
     tagList(
-      tags$p(description$data_type),
-      tags$p(description$metadata_description),
-      tags$a(href = description$metadata_link, target = '_blank', 
-             'More info')
+      tags$h4(description$data_type),
+      tags$p(description$metadata_description,
+             tags$a(href = description$metadata_link, target = '_blank', 
+                    'More info'))
     )
   })
-  
-  # output_df <- reactive({
-  #   if (input$category == 'Flow') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #            '1' = cvpiaFlow::flows_cfs, 
-  #            '2' = cvpiaFlow::bypass_flows, 
-  #            '3' = cvpiaFlow::delta_flows)
-  #     
-  #   } else if (input$category == 'Temperature') {
-  #     
-  #     tmp <- switch(input$data_type, 
-  #                   '4' = cvpiaTemperature::juv_temp, 
-  #                   '5' = cvpiaTemperature::delta_temps, 
-  #                   '6' = cvpiaTemperature::deg_days)
-  #     
-  #   } else {
-  #     
-  #   }
-  # })
-  # 
   
   output$summary_stats <- renderTable({
     df %>% 

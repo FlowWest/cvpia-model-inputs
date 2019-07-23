@@ -1,6 +1,6 @@
 shinyUI(
   navbarPage(
-    title = div(img(src="lamp.png"), NULL), 
+    title = div(img(src="lamp.png", width = '70%'), NULL), 
     header = includeCSS("www/styles.css"),
     collapsible = TRUE,
     windowTitle = "CVPIA Model Inputs",
