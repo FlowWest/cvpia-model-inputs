@@ -15,8 +15,7 @@ source('modules/home.R')
 
 metadata_lookup <- read_csv('data/metadata-lookup.csv')
 
-df <- cvpiaTemperature::delta_temps %>% 
-  filter(watershed == 'North Delta')
-
 # category data frames
 habitat <- read_rds('data/habitat.rds')
+flows <- read_rds('data/flows.rds')
+temperatures <- read_rds('data/temperatures.rds')
