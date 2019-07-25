@@ -60,11 +60,13 @@ home_server <- function(input, output, session) {
     
     if (input$category == 'Habitat') {
       df %>%
-        filter(region == input$region, species == input$species,
+        filter(region == input$region, 
+               species == input$species,
                data_type == input$data_type)
     } else {
       df %>%
-        filter(region == input$region, data_type == input$data_type)
+        filter(region == input$region, 
+               data_type == input$data_type)
     }
   })
   
@@ -97,6 +99,8 @@ home_server <- function(input, output, session) {
     
     req(input$data_type)
     
+    if (input$data_type == "Habitat") req(input$species)
+    
     description <- metadata_lookup %>% 
       filter(region == selected_region(), 
              category == input$category, 
@@ -112,6 +116,8 @@ home_server <- function(input, output, session) {
   output$summary_stats <- renderTable({
     req(input$data_type)
     
+    if (input$data_type == "Habitat") req(input$species)
+    
     selected_dataset() %>% 
       pull(value) %>% 
       summary() %>% 
@@ -124,6 +130,7 @@ home_server <- function(input, output, session) {
     req(input$data_type)
     
     selected_dataset() %>% 
+      arrange(date) %>% 
       plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
       layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
       config(displayModeBar = FALSE)
