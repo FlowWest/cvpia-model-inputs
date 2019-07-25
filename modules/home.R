@@ -59,6 +59,7 @@ home_server <- function(input, output, session) {
                  'Temperature' = temperatures)
     
     if (input$category == 'Habitat') {
+      req(input$species)
       df %>%
         filter(region == input$region, 
                species == input$species,
@@ -86,7 +87,7 @@ home_server <- function(input, output, session) {
       selectInput(ns('species'), 'Select Species', 
                   choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'))
     } else {
-      
+      NULL
     }
   })
   
@@ -98,8 +99,6 @@ home_server <- function(input, output, session) {
   output$data_type_name <- renderUI({
     
     req(input$data_type)
-    
-    if (input$data_type == "Habitat") req(input$species)
     
     description <- metadata_lookup %>% 
       filter(region == selected_region(), 
@@ -115,8 +114,6 @@ home_server <- function(input, output, session) {
   
   output$summary_stats <- renderTable({
     req(input$data_type)
-    
-    if (input$data_type == "Habitat") req(input$species)
     
     selected_dataset() %>% 
       pull(value) %>% 
