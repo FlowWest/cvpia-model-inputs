@@ -89,6 +89,7 @@ home_server <- function(input, output, session) {
   })
   
   output$region_name <- renderUI({
+    req(input$data_type)
     tags$h3(input$region)
   }) 
   
@@ -109,6 +110,8 @@ home_server <- function(input, output, session) {
   })
   
   output$summary_stats <- renderTable({
+    req(input$data_type)
+    
     selected_dataset() %>% 
       pull(value) %>% 
       summary() %>% 
@@ -118,6 +121,8 @@ home_server <- function(input, output, session) {
   
   
   output$time_series_plot <- renderPlotly({
+    req(input$data_type)
+    
     selected_dataset() %>% 
       plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
       layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
