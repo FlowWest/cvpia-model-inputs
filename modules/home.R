@@ -5,15 +5,17 @@ home_ui <- function(id) {
   tagList(
     # TODO create modal to welcome and describe the app
     fluidRow(
-      column(width = 4, 
+      column(width = 3, 
              selectInput(ns('region'), 'Select Region', 
                          choices = c(cvpiaData::watershed_ordering$watershed, 'North Delta', 'South Delta'))),
-      column(width = 4,
+      column(width = 3,
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
-      column(width = 4,
-             uiOutput(ns('data_type_input_ui')))
-      
+
+      column(width = 3,
+             uiOutput(ns('data_type_input_ui'))),
+      column(width = 3,
+             uiOutput(ns('species_input_ui')))
     ),
     fluidRow(
       column(width = 12, 
@@ -43,6 +45,32 @@ home_server <- function(input, output, session) {
     }
   })
   
+  y_axis_label <- reactive({
+    metadata_lookup %>% 
+      filter(region == selected_region(), data_type == input$data_type) %>% 
+      pull(y_axis_label) %>% 
+      unique()
+  })
+  
+  selected_dataset <- reactive({
+    df <- switch(input$category,
+                 'Habitat' = habitat,
+                 'Flow' = flows,
+                 'Temperature' = temperatures)
+    
+    if (input$category == 'Habitat') {
+      req(input$species)
+      df %>%
+        filter(region == input$region, 
+               species == input$species,
+               data_type == input$data_type)
+    } else {
+      df %>%
+        filter(region == input$region, 
+               data_type == input$data_type)
+    }
+  })
+  
   output$data_type_input_ui <- renderUI({
     
     option <- metadata_lookup %>% 
@@ -54,11 +82,24 @@ home_server <- function(input, output, session) {
                 choices = option)
   })
   
+  output$species_input_ui <- renderUI({
+    if (input$category == 'Habitat') {
+      selectInput(ns('species'), 'Select Species', 
+                  choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'))
+    } else {
+      NULL
+    }
+  })
+  
   output$region_name <- renderUI({
+    req(input$data_type)
     tags$h3(input$region)
   }) 
   
   output$data_type_name <- renderUI({
+    
+    req(input$data_type)
+    
     description <- metadata_lookup %>% 
       filter(region == selected_region(), 
              category == input$category, 
@@ -72,8 +113,10 @@ home_server <- function(input, output, session) {
   })
   
   output$summary_stats <- renderTable({
-    df %>% 
-      pull(monthly_mean_temp_c) %>% 
+    req(input$data_type)
+    
+    selected_dataset() %>% 
+      pull(value) %>% 
       summary() %>% 
       broom::tidy() %>% 
       gather(stat, value)
@@ -81,8 +124,13 @@ home_server <- function(input, output, session) {
   
   
   output$time_series_plot <- renderPlotly({
-    df %>% 
-      plot_ly(x=~date, y=~monthly_mean_temp_c, type='scatter', mode='lines')
+    req(input$data_type)
+    
+    selected_dataset() %>% 
+      arrange(date) %>% 
+      plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
+      layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
+      config(displayModeBar = FALSE)
   })
   
   
