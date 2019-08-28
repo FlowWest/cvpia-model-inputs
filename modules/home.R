@@ -41,7 +41,13 @@ home_server <- function(input, output, session) {
     if (input$category == 'Habitat') {
       input$region
     } else {
-      ifelse(input$region == 'delta', 'delta', 'watershed')
+      if (input$region %in% c('South Delta', 'North Delta')) {
+        'delta'
+      } else if (input$region %in% c('Sutter Bypass', 'Yolo Bypass')) {
+        'bypass'
+      } else {
+        'watershed'
+      }
     }
   })
   

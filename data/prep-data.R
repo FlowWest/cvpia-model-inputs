@@ -6,6 +6,97 @@ library(stringr)
 
 # HABITAT ======================================================================
 
+# delta habitats 
+north_delta_habitat <- cvpiaData::dlt_hab[, , 1] %>%
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>%
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "North Delta", 
+         value = sqm/4046.86)
+  
+south_delta_habitat <- cvpiaData::dlt_hab[, , 2] %>%
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>%
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "South Delta", 
+         value = sqm/4046.86)
+
+
+delta_habitat <- bind_rows(
+  mutate(north_delta_habitat, species = "Fall Run"),
+  mutate(north_delta_habitat, species = "Spring Run"),
+  mutate(north_delta_habitat, species = "Winter Run"),
+  mutate(north_delta_habitat, species = "Steelhead"), 
+  mutate(south_delta_habitat, species = "Fall Run"),
+  mutate(south_delta_habitat, species = "Spring Run"),
+  mutate(south_delta_habitat, species = "Winter Run"),
+  mutate(south_delta_habitat, species = "Steelhead")
+) %>% 
+  mutate(date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = 'Monthly Rearing Area') %>% 
+  select(date, value, data_type, region, species)
+
+
+# Bypass habitats -----------------
+# In channel
+sutter_ic_habitat <- cvpiaData::inchannel_bypass[1:4, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+sutter_fp_habitat <- cvpiaData::floodplain_bypass[1:4, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+sutter_habitat <- bind_rows(sutter_ic_habitat, sutter_fp_habitat) %>% 
+  group_by(month, year) %>% 
+  summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
+  mutate(region = "Sutter Bypass")
+
+yolo_ic_habitat <- cvpiaData::inchannel_bypass[5:6, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+yolo_fp_habitat <- cvpiaData::floodplain_bypass[5:6, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+yolo_habitat <- bind_rows(yolo_ic_habitat, yolo_fp_habitat) %>% 
+  group_by(month, year) %>% 
+  summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
+  mutate(region = "Yolo Bypass")
+
+
+bypass_habitats <- bind_rows(
+  mutate(sutter_habitat, species = "Fall Run"),
+  mutate(sutter_habitat, species = "Spring Run"),
+  mutate(sutter_habitat, species = "Winter Run"),
+  mutate(sutter_habitat, species = "Steelhead"),
+  mutate(yolo_habitat, species = "Fall Run"),
+  mutate(yolo_habitat, species = "Spring Run"),
+  mutate(yolo_habitat, species = "Winter Run"),
+  mutate(yolo_habitat, species = "Steelhead")
+) %>% 
+mutate(date = ymd(paste(year, month, 1, sep = '-')),
+       data_type = 'Monthly Rearing Area') %>% 
+  select(date, value, data_type, region, species)
+
+
+
+
 # Monthly floodplain rearing habitat -------------------------------------------
 fr_fp_habitat <- map_df(1:20, function(i) {
   cvpiaData::fr_fp[,,i] %>% 
@@ -250,7 +341,9 @@ glimpse(inchannel_habitat)
 habitat <- bind_rows(
   floodplain_habitat,
   spawning_habitat,
-  inchannel_habitat # TODO update when adam tells us about steelhead
+  inchannel_habitat, # TODO update when adam tells us about steelhead, 
+  bypass_habitats, 
+  delta_habitat
   )
 
 glimpse(habitat)
@@ -261,15 +354,25 @@ write_rds(habitat, 'data/habitat.rds')
 
 # monthly mean flow ---------------------------------
 
-watershed_and_bypass_flows <- 
+watershed_flows <- 
   cvpiaFlow::flows_cfs %>% 
   gather(watershed, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = watershed, value = flow_cfs, data_type)
 
+bypass_flows <- 
+  cvpiaFlow::bypass_flows %>% 
+  select(date, `Sutter Bypass` = sutter4, `Yolo Bypass` = yolo2) %>% 
+  gather(region, value, -date) %>% 
+  mutate(data_type = "Monthly Mean Flow")
+
+watershed_and_bypass_flows <- bind_rows(watershed_flows, bypass_flows)
+
 delta_flows <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, n_dlt_inflow_cfs, s_dlt_inflow_cfs) %>% 
+  select(date, 
+         `North Delta` = n_dlt_inflow_cfs, 
+         `South Delta` = s_dlt_inflow_cfs) %>% 
   gather(delta_flow_type, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = delta_flow_type, value = flow_cfs, data_type)
@@ -284,7 +387,9 @@ watershed_monthly_mean_diverted <-
 
 delta_monthly_mean_diverted <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, s_dlt_div_cfs, n_dlt_div_cfs) %>% 
+  select(date, 
+         `South Delta` = s_dlt_div_cfs, 
+         `North Delta` = n_dlt_div_cfs) %>% 
   gather(watershed, total_diverted_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Diverted") %>%
   select(date, region = watershed, value = total_diverted_cfs, data_type)
@@ -302,7 +407,9 @@ watershed_monthly_mean_prop_diverted <-
 # delta
 delta_monthly_mean_prop_diverted <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, s_dlt_prop_div, n_dlt_prop_div) %>% 
+  select(date, 
+         `South Delta` = s_dlt_prop_div, 
+         `North Delta` = n_dlt_prop_div) %>% 
   gather(watershed, proportion_diverted, -date) %>% 
   mutate(data_type = "Monthly Mean Proportion Diverted") %>%
   select(date, region = watershed, value = proportion_diverted, data_type)
