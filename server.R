@@ -3,8 +3,7 @@ function(input, output, session) {
   showModal(modalDialog(title = "Welcome!",
                         tagList(
                           tags$p("Something something something"), 
-                          tags$p("Is having a modal popup on the first"), 
-                          tags$p("launch helpful? {insert thinking emoji here}")
+                          tags$p("Is having a modal popup on the first") 
                         ),
                         easyClose = TRUE))
   
