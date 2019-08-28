@@ -5,6 +5,40 @@ library(stringr)
 # repeat for all of the habitat arrays
 
 # HABITAT ======================================================================
+
+# delta habitats 
+north_delta_habitat <- cvpiaData::dlt_hab[, , 1] %>%
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>%
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "North Delta", 
+         value = sqm/4046.86)
+  
+south_delta_habitat <- cvpiaData::dlt_hab[, , 2] %>%
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>%
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "South Delta", 
+         value = sqm/4046.86)
+
+
+delta_habitat <- bind_rows(
+  mutate(north_delta_habitat, species = "Fall Run"),
+  mutate(north_delta_habitat, species = "Spring Run"),
+  mutate(north_delta_habitat, species = "Winter Run"),
+  mutate(north_delta_habitat, species = "Steelhead"), 
+  mutate(south_delta_habitat, species = "Fall Run"),
+  mutate(south_delta_habitat, species = "Spring Run"),
+  mutate(south_delta_habitat, species = "Winter Run"),
+  mutate(south_delta_habitat, species = "Steelhead")
+) %>% 
+  mutate(date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = 'Monthly Rearing Area') %>% 
+  select(date, value, data_type, region, species)
+
+
 # Bypass habitats
 # In channel
 sutter_ic_habitat <- cvpiaData::inchannel_bypass[1:4, ,] %>% 
@@ -317,7 +351,8 @@ habitat <- bind_rows(
   spawning_habitat,
   inchannel_habitat, # TODO update when adam tells us about steelhead, 
   bypass_ic_habitats, 
-  bypass_fp_habitats
+  bypass_fp_habitats, 
+  delta_habitat
   )
 
 glimpse(habitat)
