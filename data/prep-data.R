@@ -39,69 +39,61 @@ delta_habitat <- bind_rows(
   select(date, value, data_type, region, species)
 
 
-# Bypass habitats
+# Bypass habitats -----------------
 # In channel
 sutter_ic_habitat <- cvpiaData::inchannel_bypass[1:4, ,] %>% 
   colSums() %>% 
   as.data.frame() %>% 
   mutate(month = 1:12) %>% 
   gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
-         region = "Sutter Bypass", 
-         species = "Fall Run", 
-         value = sqm/4046.86) %>% 
-  select(year, month, region, value, species)
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+sutter_fp_habitat <- cvpiaData::floodplain_bypass[1:4, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
+
+sutter_habitat <- bind_rows(sutter_ic_habitat, sutter_fp_habitat) %>% 
+  group_by(month, year) %>% 
+  summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
+  mutate(region = "Sutter Bypass")
 
 yolo_ic_habitat <- cvpiaData::inchannel_bypass[5:6, ,] %>% 
   colSums() %>% 
   as.data.frame() %>% 
   mutate(month = 1:12) %>% 
   gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
-         region = "Yolo Bypass", 
-         species = "Fall Run", 
-         value = sqm/4046.86) %>% 
-  select(year, month, region, value, species)
-
-# floodplain
-sutter_fp_habitat <- cvpiaData::floodplain_bypass[1:4, ,] %>% 
-  colSums() %>% 
-  as.data.frame() %>% 
-  mutate(month = 1:12) %>% 
-  gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
-         region = "Sutter Bypass", 
-         species = "Fall Run", 
-         value = sqm/4046.86) %>% 
-  select(year, month, region, value, species)
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
 
 yolo_fp_habitat <- cvpiaData::floodplain_bypass[5:6, ,] %>% 
   colSums() %>% 
   as.data.frame() %>% 
   mutate(month = 1:12) %>% 
   gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
-         region = "Yolo Bypass", 
-         species = "Fall Run", 
-         value = sqm/4046.86) %>% 
-  select(year, month, region, value, species)
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
 
-bypass_fp_habitats <- bind_rows(
-  sutter_fp_habitat, 
-  yolo_fp_habitat, 
+yolo_habitat <- bind_rows(yolo_ic_habitat, yolo_fp_habitat) %>% 
+  group_by(month, year) %>% 
+  summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
+  mutate(region = "Yolo Bypass")
+
+
+bypass_habitats <- bind_rows(
+  mutate(sutter_habitat, species = "Fall Run"),
+  mutate(sutter_habitat, species = "Spring Run"),
+  mutate(sutter_habitat, species = "Winter Run"),
+  mutate(sutter_habitat, species = "Steelhead"),
+  mutate(yolo_habitat, species = "Fall Run"),
+  mutate(yolo_habitat, species = "Spring Run"),
+  mutate(yolo_habitat, species = "Winter Run"),
+  mutate(yolo_habitat, species = "Steelhead")
 ) %>% 
 mutate(date = ymd(paste(year, month, 1, sep = '-')),
-       data_type = 'Monthly Floodplain Rearing Area') %>% 
+       data_type = 'Monthly Rearing Area') %>% 
   select(date, value, data_type, region, species)
 
-
-bypass_ic_habitats <- bind_rows(
-  sutter_ic_habitat, 
-  yolo_ic_habitat, 
-) %>% 
-  mutate(date = ymd(paste(year, month, 1, sep = '-')),
-         data_type = 'Monthly In-channel Rearing Area') %>% 
-  select(date, value, data_type, region, species)
 
 
 
@@ -350,8 +342,7 @@ habitat <- bind_rows(
   floodplain_habitat,
   spawning_habitat,
   inchannel_habitat, # TODO update when adam tells us about steelhead, 
-  bypass_ic_habitats, 
-  bypass_fp_habitats, 
+  bypass_habitats, 
   delta_habitat
   )
 
