@@ -261,11 +261,19 @@ write_rds(habitat, 'data/habitat.rds')
 
 # monthly mean flow ---------------------------------
 
-watershed_and_bypass_flows <- 
+watershed_flows <- 
   cvpiaFlow::flows_cfs %>% 
   gather(watershed, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = watershed, value = flow_cfs, data_type)
+
+bypass_flows <- 
+  cvpiaFlow::bypass_flows %>% 
+  select(date, `Sutter Bypass` = sutter4, `Yolo Bypass` = yolo2) %>% 
+  gather(region, value, -date) %>% 
+  mutate(data_type = "Monthly Mean Flow")
+
+watershed_and_bypass_flows <- bind_rows(watershed_flows, bypass_flows)
 
 delta_flows <- 
   cvpiaFlow::delta_flows %>% 
