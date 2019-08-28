@@ -344,7 +344,9 @@ watershed_and_bypass_flows <- bind_rows(watershed_flows, bypass_flows)
 
 delta_flows <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, n_dlt_inflow_cfs, s_dlt_inflow_cfs) %>% 
+  select(date, 
+         `North Delta` = n_dlt_inflow_cfs, 
+         `South Delta` = s_dlt_inflow_cfs) %>% 
   gather(delta_flow_type, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = delta_flow_type, value = flow_cfs, data_type)
@@ -359,7 +361,9 @@ watershed_monthly_mean_diverted <-
 
 delta_monthly_mean_diverted <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, s_dlt_div_cfs, n_dlt_div_cfs) %>% 
+  select(date, 
+         `South Delta` = s_dlt_div_cfs, 
+         `North Delta` = n_dlt_div_cfs) %>% 
   gather(watershed, total_diverted_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Diverted") %>%
   select(date, region = watershed, value = total_diverted_cfs, data_type)
@@ -377,7 +381,9 @@ watershed_monthly_mean_prop_diverted <-
 # delta
 delta_monthly_mean_prop_diverted <- 
   cvpiaFlow::delta_flows %>% 
-  select(date, s_dlt_prop_div, n_dlt_prop_div) %>% 
+  select(date, 
+         `South Delta` = s_dlt_prop_div, 
+         `North Delta` = n_dlt_prop_div) %>% 
   gather(watershed, proportion_diverted, -date) %>% 
   mutate(data_type = "Monthly Mean Proportion Diverted") %>%
   select(date, region = watershed, value = proportion_diverted, data_type)
