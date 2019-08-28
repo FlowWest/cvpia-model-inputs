@@ -121,11 +121,17 @@ home_server <- function(input, output, session) {
   output$summary_stats <- renderTable({
     req(input$data_type)
     
+    stat_label <- metadata_lookup %>% 
+      filter(region == selected_region(), category == input$category, 
+             data_type == input$data_type) %>% 
+      pull(stat_label)
+    
     selected_dataset() %>% 
       pull(value) %>% 
       summary() %>% 
       broom::tidy() %>% 
-      gather(stat, value)
+      gather(stat, value) %>% 
+      mutate(value = paste(pretty_num(value, 0), stat_label))
   }, colnames = FALSE)
   
   
