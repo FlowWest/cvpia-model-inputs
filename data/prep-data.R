@@ -5,6 +5,71 @@ library(stringr)
 # repeat for all of the habitat arrays
 
 # HABITAT ======================================================================
+# Bypass habitats
+# In channel
+sutter_ic_habitat <- cvpiaData::inchannel_bypass[1:4, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "Sutter Bypass", 
+         species = "Fall Run", 
+         value = sqm/4046.86) %>% 
+  select(year, month, region, value, species)
+
+yolo_ic_habitat <- cvpiaData::inchannel_bypass[5:6, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "Yolo Bypass", 
+         species = "Fall Run", 
+         value = sqm/4046.86) %>% 
+  select(year, month, region, value, species)
+
+# floodplain
+sutter_fp_habitat <- cvpiaData::floodplain_bypass[1:4, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "Sutter Bypass", 
+         species = "Fall Run", 
+         value = sqm/4046.86) %>% 
+  select(year, month, region, value, species)
+
+yolo_fp_habitat <- cvpiaData::floodplain_bypass[5:6, ,] %>% 
+  colSums() %>% 
+  as.data.frame() %>% 
+  mutate(month = 1:12) %>% 
+  gather(year, sqm, -month) %>% 
+  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979, 
+         region = "Yolo Bypass", 
+         species = "Fall Run", 
+         value = sqm/4046.86) %>% 
+  select(year, month, region, value, species)
+
+bypass_fp_habitats <- bind_rows(
+  sutter_fp_habitat, 
+  yolo_fp_habitat, 
+) %>% 
+mutate(date = ymd(paste(year, month, 1, sep = '-')),
+       data_type = 'Monthly Floodplain Rearing Area') %>% 
+  select(date, value, data_type, region, species)
+
+
+bypass_ic_habitats <- bind_rows(
+  sutter_ic_habitat, 
+  yolo_ic_habitat, 
+) %>% 
+  mutate(date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = 'Monthly In-channel Rearing Area') %>% 
+  select(date, value, data_type, region, species)
+
+
 
 # Monthly floodplain rearing habitat -------------------------------------------
 fr_fp_habitat <- map_df(1:20, function(i) {
@@ -250,7 +315,9 @@ glimpse(inchannel_habitat)
 habitat <- bind_rows(
   floodplain_habitat,
   spawning_habitat,
-  inchannel_habitat # TODO update when adam tells us about steelhead
+  inchannel_habitat, # TODO update when adam tells us about steelhead, 
+  bypass_ic_habitats, 
+  bypass_fp_habitats
   )
 
 glimpse(habitat)
