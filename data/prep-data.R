@@ -470,19 +470,56 @@ sr_habitat_scales <- tibble(
   watershed = c(sr_spawning_scaled_watersheds, sr_rearing_scaled_watersheds), 
   type = c(rep("Spawning", length(sr_spawning_scaled_watersheds)), 
            rep("Rearing", length(sr_rearing_scaled_watersheds))), 
-  scale = spring_run_scales
+  scale = spring_run_scales, 
+  species = "Spring Run"
 )
 
 
+# Winter Run
 
 
+winter_run_scales <- c(1.8199040, 1.0000000, 1.1455608, 0.7771235, 1.8103872, 1.0804059, 1.2378641, 0.9892381,
+                       1.2751834)
 
 
+# spawn 
+# 1 Upper Sac
+
+# rear
+# 2 Upper Sac
+# 3 Upper-mid Sac (corridor for above)
+# 4 Lower-mid Sac (corridor for above)
+# 5 Lower Sac (corridor for above)
+# 6 Sutter (corridor for above) is changed below
+# 7 Yolo (corridor for above) is changed below
+# 8 North Delta
+# 9 South Delta
 
 
+wr_spawning_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1)]
+
+wr_rearing_scaled_watershds <- 
+  c(cvpiaData::watershed_ordering$watershed[c(1, 16, 21, 24, 17, 22)], 
+    "North Delta", "South Delta")
 
 
+wr_habitat_scales <- tibble(
+  watershed = c(wr_spawning_scaled_watersheds, wr_rearing_scaled_watershds), 
+  type = c(rep("Spawning", length(wr_spawning_scaled_watersheds)), 
+           rep("Rearing", length(wr_rearing_scaled_watershds))), 
+  scale = winter_run_scales, 
+  species = "Winter Run"
+)
 
+
+habitat_scales <- bind_rows(
+  wr_habitat_scales, 
+  sr_habitat_scales, 
+  fr_habitat_scales
+) 
+
+write_rds(habitat_scales, "data/habitat_scales.rds")
 
 
 

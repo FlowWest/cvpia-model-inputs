@@ -14,8 +14,10 @@ home_ui <- function(id) {
 
       column(width = 3,
              uiOutput(ns('data_type_input_ui'))),
-      column(width = 3,
-             uiOutput(ns('species_input_ui')))
+      column(width = 2,
+             uiOutput(ns('species_input_ui'))), 
+      column(width = 1, 
+             uiOutput(ns('show_unscaled_ui')))
     ),
     fluidRow(
       column(width = 12, 
@@ -70,6 +72,31 @@ home_server <- function(input, output, session) {
                data_type == input$data_type)
     }
   })
+  
+  watershed_hab_scale <- reactive({
+    if (input$data_type == "Monthly In-Channel Rearing Area") {
+      habitat_scales %>% 
+        filter(watershed == input$region, 
+               type == "Rearing", 
+               species == input$species) %>% 
+        pull(scale)
+    } else if (input$data_type == "Monthly Spawning Rearing Area") {
+      habitat_scales %>% 
+        filter(watershed == input$region, 
+               type == "Spawning", 
+               species == input$species) %>% 
+        pull(scale)
+    } else {
+      1
+    }
+  })
+  
+  output$show_unscaled_ui <- renderUI({
+    if (input$category == 'Habitat') {
+      checkboxInput(ns('show_unscaled'), 'Show Unscaled', value = FALSE)
+    } else {
+      NULL
+    }  })
   
   output$data_type_input_ui <- renderUI({
     
