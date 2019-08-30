@@ -1,0 +1,35 @@
+watershed,type,scale
+Upper Sacramento River,Spawning,1.8615848
+Butte Creek,Spawning,0.5
+Clear Creek,Spawning,0.5
+Deer Creek,Spawning,1.423037
+Mill Creek,Spawning,0.5887938
+Feather River,Spawning,2
+Yuba River,Spawning,0.5034449
+American River,Spawning,0.5502821
+Cosumnes River,Spawning,1.6139332
+Mokelumne River,Spawning,0.955134
+Merced River,Spawning,1.6993421
+Stanislaus River,Spawning,0.962723
+Tuolumne River,Spawning,0.9959632
+Upper Sacramento River,Rearing,0.5
+Butte Creek,Rearing,1.8237525
+Clear Creek,Rearing,2
+Deer Creek,Rearing,1.9999999
+Mill Creek,Rearing,2
+Upper-mid Sacramento River,Rearing,2
+Feather River,Rearing,0.9783833
+Yuba River,Rearing,1.540686
+Lower-mid Sacramento River,Rearing,0.659648
+American River,Rearing,1.9999994
+Lower Sacramento River,Rearing,1.9999994
+Cosumnes River,Rearing,0.5000423
+Mokelumne River,Rearing,0.6147676
+Merced River,Rearing,0.6598354
+Stanislaus River,Rearing,0.8103934
+Tuolumne River,Rearing,1.2434156
+San Joaquin River,Rearing,1.4492968
+Sutter Bypass,Rearing,0.9347787
+Yolo Bypass,Rearing,1.6509423
+North Delta,Rearing,0.5
+South Delta,Rearing,1.9800862

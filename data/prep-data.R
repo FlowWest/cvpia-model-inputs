@@ -375,6 +375,7 @@ scales <- c(1.8615848, 0.5000000,
             0.5000000, 1.9800862)
 
 
+# SPAWN
 # 1 Upper Sac
 # 2 Butte
 # 3 Clear
@@ -389,13 +390,44 @@ scales <- c(1.8615848, 0.5000000,
 # 12 Stanislaus
 # 13 Tuolumne
 
-scaled_watersheds <- 
-  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 19, 20, 23, 26, 27, 28, 29, 30)]
+# REAR 
+# 1 Upper Sac
+# 2 Butte
+# 3 Clear
+# 4 Deer
+# 5 Mill
+# 6 Upper-mid Sac (corridor for above)
+# 7 Sutter (corridor for above) is changed below
+# 8 Feather 
+# 9 Yuba
+# 10 Lower-mid Sac (corridor for above)
+# 11 Yolo (corridor for above) is changed below
+# 12 American
+# 13 Lower Sac (corridor for above)
+# 14 Cosumness 
+# 15 Mokelumne 
+# 16 Merced
+# 17 Stanislaus 
+# 18 Tuolumne
+# 19 SJ (corridor for Merced, Stan, and Tuolumne)
 
-habitat_scalrs <- tibble(
-  watershed = rep(cvpiaData::watershed_ordering$watershed, 2),
-  type = c(rep(scaled_watersheds, 2))
-)
+spawning_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 19, 20, 
+                                            23, 26, 27, 28, 29, 30)]
+
+rearing_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 16, 
+                                            19, 20, 21, 23, 24,
+                                            26, 27, 28, 29, 30, 31, 17, 22)]
+
+habitat_scales <- tibble(
+  watershed = c(spawning_scaled_watersheds, rearing_scaled_watersheds, "North Delta", "South Delta"),
+  type = c(rep("Spawning", length(spawning_scaled_watersheds)), 
+           rep("Rearing", length(rearing_scaled_watersheds) + 2)), 
+  scale = scales
+  ) 
+
+write_csv(habitat_scales, "data/habitat-scales.csv")
 
 
 
