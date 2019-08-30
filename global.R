@@ -20,3 +20,9 @@ habitat <- read_rds('data/habitat.rds')
 flows <- read_rds('data/flows.rds')
 temperatures <- read_rds('data/temperatures.rds')
 habitat_scales <- read_rds("data/habitat_scales.rds")
+
+
+pretty_num <- function(num, places = 2) {
+  format(round(num, places), big.mark = ',', drop = FALSE)
+}
+

@@ -43,7 +43,13 @@ home_server <- function(input, output, session) {
     if (input$category == 'Habitat') {
       input$region
     } else {
-      ifelse(input$region == 'delta', 'delta', 'watershed')
+      if (input$region %in% c('South Delta', 'North Delta')) {
+        'delta'
+      } else if (input$region %in% c('Sutter Bypass', 'Yolo Bypass')) {
+        'bypass'
+      } else {
+        'watershed'
+      }
     }
   })
   
@@ -142,11 +148,17 @@ home_server <- function(input, output, session) {
   output$summary_stats <- renderTable({
     req(input$data_type)
     
+    stat_label <- metadata_lookup %>% 
+      filter(region == selected_region(), category == input$category, 
+             data_type == input$data_type) %>% 
+      pull(stat_label)
+    
     selected_dataset() %>% 
       pull(value) %>% 
       summary() %>% 
       broom::tidy() %>% 
-      gather(stat, value)
+      gather(stat, value) %>% 
+      mutate(value = paste(pretty_num(value, 0), stat_label))
   }, colnames = FALSE)
   
   
