@@ -352,11 +352,50 @@ temperatures <- bind_rows(
 write_rds(temperatures, "data/temperatures.rds")
 
 
+# Habitat Scaling Factors 
+
+# here 1-13 are spawning scalars
+# 14-n are the rearing scalars
+scales <- c(1.8615848, 0.5000000, 
+            0.5000000, 1.4230370, 
+            0.5887938, 2.0000000, 
+            0.5034449, 0.5502821,
+            1.6139332, 0.9551340, 
+            1.6993421, 0.9627230, 
+            0.9959632, 0.5000000, 
+            1.8237525, 2.0000000,
+            1.9999999, 2.0000000, 
+            2.0000000, 0.9783833, 
+            1.5406860, 0.6596480, 
+            1.9999994, 1.9999994,
+            0.5000423, 0.6147676, 
+            0.6598354, 0.8103934, 
+            1.2434156, 1.4492968, 
+            0.9347787, 1.6509423,
+            0.5000000, 1.9800862)
 
 
+# 1 Upper Sac
+# 2 Butte
+# 3 Clear
+# 4 Deer
+# 5 Mill
+# 6 Feather
+# 7 Yuba
+# 8 American
+# 9 Cosumness
+# 10 Mokelumne
+# 11 Merced
+# 12 Stanislaus
+# 13 Tuolumne
 
+scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 19, 20, 23, 26, 27, 28, 29, 30)]
 
-
+habitat_scalrs <- tibble(
+  watershed = rep(cvpiaData::watershed_ordering$watershed, 2),
+  type = c(rep(scaled_watersheds, 2))
+)
 
 
 
