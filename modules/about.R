@@ -4,10 +4,12 @@ about_ui <- function(id) {
   
   tagList(
     fluidRow(
-      column(width = 12,
+      column(width = 3),
+      column(width = 6, 
              tags$h1('About'),
-             tags$p('some really interesting things')
-             )
+             includeMarkdown("templates/about.md")
+             ), 
+      column(width = 3)
     )
   )
   
