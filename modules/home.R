@@ -15,9 +15,7 @@ home_ui <- function(id) {
       column(width = 3,
              uiOutput(ns('data_type_input_ui'))),
       column(width = 2,
-             uiOutput(ns('species_input_ui'))), 
-      column(width = 1, 
-             uiOutput(ns('show_unscaled_ui')))
+             uiOutput(ns('species_input_ui')))
     ),
     fluidRow(
       column(width = 12, 
@@ -97,12 +95,15 @@ home_server <- function(input, output, session) {
     }
   })
   
+  # Show scaled or unscaled version of the habitat?
   output$show_unscaled_ui <- renderUI({
+    req(input$species)
     if (input$category == 'Habitat') {
       checkboxInput(ns('show_unscaled'), 'Show Unscaled', value = FALSE)
     } else {
       NULL
     }  })
+
   
   output$data_type_input_ui <- renderUI({
     
@@ -117,15 +118,23 @@ home_server <- function(input, output, session) {
   
   output$species_input_ui <- renderUI({
     if (input$category == 'Habitat') {
-      selectInput(ns('species'), 'Select Species', 
-                  choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'))
+      
+      tagList(
+        tags$div(style = "display:inline-block",
+        selectInput(ns('species'), 'Select Species', 
+                    choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'), 
+                    width = 150)),
+        tags$div(style = "display:inline-block",
+        checkboxInput(ns("show_unscaled"), "Show Habitat Unscaled", 
+                      value = F))
+      )
+      
     } else {
       NULL
     }
   })
   
   output$region_name <- renderUI({
-    req(input$data_type)
     tags$h3(input$region)
   }) 
   
@@ -153,7 +162,18 @@ home_server <- function(input, output, session) {
              data_type == input$data_type) %>% 
       pull(stat_label)
     
-    selected_dataset() %>% 
+    d <- if (input$category == "Habitat") {
+      req(input$species)
+      if (!input$show_unscaled)
+        selected_dataset() %>% 
+          select(-value) %>% 
+          rename(value = scaled_habitat)
+      else selected_dataset()
+    } else {
+      selected_dataset()
+    }
+    
+    d %>% 
       pull(value) %>% 
       summary() %>% 
       broom::tidy() %>% 
@@ -165,14 +185,31 @@ home_server <- function(input, output, session) {
   output$time_series_plot <- renderPlotly({
     req(input$data_type)
     
-    selected_dataset() %>% 
-      arrange(date) %>% 
-      plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
-      layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
-      config(displayModeBar = FALSE)
+    # deal with habitat scaled or unscaled plot
+    if (input$category == "Habitat") {
+      req(input$species)
+      
+      if (input$show_unscaled) {
+        selected_dataset() %>% 
+          arrange(date) %>% 
+          plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
+          layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
+          config(displayModeBar = FALSE)
+      } else {
+        selected_dataset() %>% 
+          arrange(date) %>% 
+          plot_ly(x=~date, y=~scaled_habitat, type='scatter', mode='lines') %>% 
+          layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
+          config(displayModeBar = FALSE)
+      }
+    } else {
+      selected_dataset() %>% 
+        arrange(date) %>% 
+        plot_ly(x=~date, y=~value, type='scatter', mode='lines') %>% 
+        layout(yaxis = list(title = y_axis_label(), rangemode = 'tozero')) %>% 
+        config(displayModeBar = FALSE)
+    }
   })
-  
-  
   
   
   

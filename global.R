@@ -16,13 +16,13 @@ source('modules/home.R')
 metadata_lookup <- read_csv('data/metadata-lookup.csv')
 
 # category data frames
-habitat <- read_rds('data/habitat.rds')
+# habitat <- read_rds('data/habitat.rds')
 flows <- read_rds('data/flows.rds')
 temperatures <- read_rds('data/temperatures.rds')
-habitat_scales <- read_rds("data/habitat_scales.rds")
-
+habitat <- read_rds("data/habitat_with_scales.rds")
 
 pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
+
 
