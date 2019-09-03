@@ -530,11 +530,11 @@ fr_rearing_scaled_watersheds <-
                                             26, 27, 28, 29, 30, 31, 17, 22)]
 
 fr_habitat_scales <- tibble(
-  watershed = c(fr_spawning_scaled_watersheds, 
+  region = c(fr_spawning_scaled_watersheds, 
                 fr_rearing_scaled_watersheds, "North Delta", "South Delta"),
-  type = c(rep("Spawning", length(spawning_scaled_watersheds)), 
-           rep("Rearing", length(rearing_scaled_watersheds) + 2)), 
-  scale = scales, 
+  type = c(rep("Spawning", length(fr_spawning_scaled_watersheds)), 
+           rep("Rearing", length(fr_rearing_scaled_watersheds) + 2)), 
+  scale = fall_run_scales, 
   species = "Fall Run"
 ) 
 
@@ -574,7 +574,7 @@ sr_rearing_scaled_watersheds <-
 
 
 sr_habitat_scales <- tibble(
-  watershed = c(sr_spawning_scaled_watersheds, sr_rearing_scaled_watersheds), 
+  region = c(sr_spawning_scaled_watersheds, sr_rearing_scaled_watersheds), 
   type = c(rep("Spawning", length(sr_spawning_scaled_watersheds)), 
            rep("Rearing", length(sr_rearing_scaled_watersheds))), 
   scale = spring_run_scales, 
@@ -612,7 +612,7 @@ wr_rearing_scaled_watershds <-
 
 
 wr_habitat_scales <- tibble(
-  watershed = c(wr_spawning_scaled_watersheds, wr_rearing_scaled_watershds), 
+  region = c(wr_spawning_scaled_watersheds, wr_rearing_scaled_watershds), 
   type = c(rep("Spawning", length(wr_spawning_scaled_watersheds)), 
            rep("Rearing", length(wr_rearing_scaled_watershds))), 
   scale = winter_run_scales, 
@@ -628,8 +628,24 @@ habitat_scales <- bind_rows(
 
 write_rds(habitat_scales, "data/habitat_scales.rds")
 
+# attach the scales as part of the habitat dataframe here
+
+# habitat modified is just the habitat dataset with an additional 
+# column type that will allow us to left join to the scales dataset
+habitat_modified <- read_rds("data/habitat.rds") %>%
+  mutate(
+    type = case_when(
+      data_type == "Monthly In-channel Rearing Area" ~ "Rearing", 
+      data_type == "Monthly Rearing Area" ~ "Rearing", 
+      data_type == "Monthly Spawning Rearing Area" ~ "Spawning", 
+      TRUE ~ as.character(NA)
+    )
+  )
+
+habitat_with_scales <- habitat_modified %>% as_tibble() %>% 
+  left_join(habitat_scales) %>% 
+  mutate(scale = ifelse(is.na(scale), 1, scale), 
+         scaled_habitat = value * scale)
 
 
-
-
-
+write_rds(habitat_with_scales, "data/habitat_with_scales.rds")
