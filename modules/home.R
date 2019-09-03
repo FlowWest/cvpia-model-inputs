@@ -27,7 +27,8 @@ home_ui <- function(id) {
              tags$h5("Summary Statistics"),
              tableOutput(ns('summary_stats'))),
       column(width = 9, 
-             plotlyOutput(ns('time_series_plot')))
+             plotlyOutput(ns('time_series_plot')), 
+             uiOutput(ns("scaled_note")))
     )
   )
   
@@ -211,6 +212,22 @@ home_server <- function(input, output, session) {
     }
   })
   
-  
+  output$scaled_note <- renderUI({
+    req(input$species)
+    
+    if (input$category == "Habitat") {
+      scaling_factor <- selected_dataset() %>% head(1) %>% pull(scale)
+      if (!input$show_unscaled & scaling_factor != 1) {
+        tags$p(tags$em("The original habitat modeling values were scaled by a factor of"),
+               tags$b(tags$em(scaling_factor)), 
+               tags$em("during the calibration process."))
+      } else {
+        NULL
+      }
+    } else {
+      NULL
+    } 
+    
+  })
   
 }
