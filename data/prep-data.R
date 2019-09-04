@@ -459,29 +459,193 @@ temperatures <- bind_rows(
 write_rds(temperatures, "data/temperatures.rds")
 
 
+# Habitat Scaling Factors ------------------------------------------------------
+
+# Fall Run Scales
+# SPAWN
+# 1 Upper Sac
+# 2 Butte
+# 3 Clear
+# 4 Deer
+# 5 Mill
+# 6 Feather
+# 7 Yuba
+# 8 American
+# 9 Cosumness
+# 10 Mokelumne
+# 11 Merced
+# 12 Stanislaus
+# 13 Tuolumne
+
+# REAR 
+# 1 Upper Sac
+# 2 Butte
+# 3 Clear
+# 4 Deer
+# 5 Mill
+# 6 Upper-mid Sac (corridor for above)
+# 7 Sutter (corridor for above) is changed below
+# 8 Feather 
+# 9 Yuba
+# 10 Lower-mid Sac (corridor for above)
+# 11 Yolo (corridor for above) is changed below
+# 12 American
+# 13 Lower Sac (corridor for above)
+# 14 Cosumness 
+# 15 Mokelumne 
+# 16 Merced
+# 17 Stanislaus 
+# 18 Tuolumne
+# 19 SJ (corridor for Merced, Stan, and Tuolumne)
+# here 1-13 are spawning scalars
+# 14-n are the rearing scalars
+fall_run_scales <- c(1.8615848, 0.5000000, 
+            0.5000000, 1.4230370, 
+            0.5887938, 2.0000000, 
+            0.5034449, 0.5502821,
+            1.6139332, 0.9551340, 
+            1.6993421, 0.9627230, 
+            0.9959632, 0.5000000, 
+            1.8237525, 2.0000000,
+            1.9999999, 2.0000000, 
+            2.0000000, 0.9783833, 
+            1.5406860, 0.6596480, 
+            1.9999994, 1.9999994,
+            0.5000423, 0.6147676, 
+            0.6598354, 0.8103934, 
+            1.2434156, 1.4492968, 
+            0.9347787, 1.6509423,
+            0.5000000, 1.9800862)
 
 
 
 
+fr_spawning_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 19, 20, 
+                                            23, 26, 27, 28, 29, 30)]
+
+fr_rearing_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1, 6, 7, 10, 12, 16, 
+                                            19, 20, 21, 23, 24,
+                                            26, 27, 28, 29, 30, 31, 17, 22)]
+
+fr_habitat_scales <- tibble(
+  region = c(fr_spawning_scaled_watersheds, 
+                fr_rearing_scaled_watersheds, "North Delta", "South Delta"),
+  type = c(rep("Spawning", length(fr_spawning_scaled_watersheds)), 
+           rep("Rearing", length(fr_rearing_scaled_watersheds) + 2)), 
+  scale = fall_run_scales, 
+  species = "Fall Run"
+) 
+
+# Spring Run 
+# spawn
+# 1-5
+# 1 Butte
+# 2 Deer
+# 3 Mill
+# 4 Feather
+# 5 Yuba
+
+# rear 
+# 6 Butte
+# 7 Deer
+# 8 Mill
+# 9 Upper-mid Sac (corridor for above)
+# 10 Feather 
+# 11 Yuba
+# 12 Lower-mid Sac (corridor for above)
+# 13 Lower Sac (corridor for above)
+# 14 Sutter (corridor for above) is changed below
+# 15 Yolo (corridor for above) is changed below
+# 16 North Delta
+# 17 South Delta
+
+spring_run_scales <- c(2.0000000, 1.5463308, 1.7198077, 0.5084355, 0.5324278, 0.6570386, 0.5000000, 0.5000000, 0.6368001, 0.5000000, 1.4077922,
+                       1.9999997, 1.7208838, 0.9353273, 1.8738324, 1.3860064, 1.8283264)
 
 
+sr_spawning_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(6, 10, 12, 19, 20)]
+
+sr_rearing_scaled_watersheds <- 
+  c(cvpiaData::watershed_ordering$watershed[c(6, 10, 12, 16, 19, 20, 21, 
+                                            24, 17, 22)], "North Delta", "South Delta")
 
 
+sr_habitat_scales <- tibble(
+  region = c(sr_spawning_scaled_watersheds, sr_rearing_scaled_watersheds), 
+  type = c(rep("Spawning", length(sr_spawning_scaled_watersheds)), 
+           rep("Rearing", length(sr_rearing_scaled_watersheds))), 
+  scale = spring_run_scales, 
+  species = "Spring Run"
+)
 
 
+# Winter Run
 
 
+winter_run_scales <- c(1.8199040, 1.0000000, 1.1455608, 0.7771235, 1.8103872, 1.0804059, 1.2378641, 0.9892381,
+                       1.2751834)
 
 
+# spawn 
+# 1 Upper Sac
+
+# rear
+# 2 Upper Sac
+# 3 Upper-mid Sac (corridor for above)
+# 4 Lower-mid Sac (corridor for above)
+# 5 Lower Sac (corridor for above)
+# 6 Sutter (corridor for above) is changed below
+# 7 Yolo (corridor for above) is changed below
+# 8 North Delta
+# 9 South Delta
 
 
+wr_spawning_scaled_watersheds <- 
+  cvpiaData::watershed_ordering$watershed[c(1)]
+
+wr_rearing_scaled_watershds <- 
+  c(cvpiaData::watershed_ordering$watershed[c(1, 16, 21, 24, 17, 22)], 
+    "North Delta", "South Delta")
 
 
+wr_habitat_scales <- tibble(
+  region = c(wr_spawning_scaled_watersheds, wr_rearing_scaled_watershds), 
+  type = c(rep("Spawning", length(wr_spawning_scaled_watersheds)), 
+           rep("Rearing", length(wr_rearing_scaled_watershds))), 
+  scale = winter_run_scales, 
+  species = "Winter Run"
+)
 
 
+habitat_scales <- bind_rows(
+  wr_habitat_scales, 
+  sr_habitat_scales, 
+  fr_habitat_scales
+) 
+
+write_rds(habitat_scales, "data/habitat_scales.rds")
+
+# attach the scales as part of the habitat dataframe here
+
+# habitat modified is just the habitat dataset with an additional 
+# column type that will allow us to left join to the scales dataset
+habitat_modified <- read_rds("data/habitat.rds") %>%
+  mutate(
+    type = case_when(
+      data_type == "Monthly In-channel Rearing Area" ~ "Rearing", 
+      data_type == "Monthly Rearing Area" ~ "Rearing", 
+      data_type == "Monthly Spawning Rearing Area" ~ "Spawning", 
+      TRUE ~ as.character(NA)
+    )
+  )
+
+habitat_with_scales <- habitat_modified %>% as_tibble() %>% 
+  left_join(habitat_scales) %>% 
+  mutate(scale = ifelse(is.na(scale), 1, scale), 
+         scaled_habitat = value * scale)
 
 
-
-
-
-
+write_rds(habitat_with_scales, "data/habitat_with_scales.rds")
