@@ -79,24 +79,6 @@ home_server <- function(input, output, session) {
     }
   })
   
-  watershed_hab_scale <- reactive({
-    if (input$data_type == "Monthly In-Channel Rearing Area") {
-      habitat_scales %>% 
-        filter(watershed == input$region, 
-               type == "Rearing", 
-               species == input$species) %>% 
-        pull(scale)
-    } else if (input$data_type == "Monthly Spawning Rearing Area") {
-      habitat_scales %>% 
-        filter(watershed == input$region, 
-               type == "Spawning", 
-               species == input$species) %>% 
-        pull(scale)
-    } else {
-      1
-    }
-  })
-  
   output$data_type_input_ui <- renderUI({
     
     option <- metadata_lookup %>% 
