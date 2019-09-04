@@ -3,7 +3,6 @@ home_ui <- function(id) {
   ns <- NS(id)
   
   tagList(
-    # TODO create modal to welcome and describe the app
     fluidRow(
       column(width = 3, 
              selectInput(ns('region'), 'Select Region', 
@@ -12,10 +11,12 @@ home_ui <- function(id) {
              selectInput(ns('category'), 'Select Category', 
                          choices = c('Flow', 'Temperature', 'Habitat'))),
 
-      column(width = 3,
-             uiOutput(ns('data_type_input_ui'))),
       column(width = 2,
-             uiOutput(ns('species_input_ui')))
+             uiOutput(ns('data_type_input_ui'))),
+      column(width = 1,
+             uiOutput(ns('species_input_ui'))), 
+      column(width = 2, 
+             uiOutput(ns('show_unscaled_ui')))
     ),
     fluidRow(
       column(width = 12, 
@@ -27,7 +28,7 @@ home_ui <- function(id) {
              tags$h5("Summary Statistics"),
              tableOutput(ns('summary_stats'))),
       column(width = 9, 
-             plotlyOutput(ns('time_series_plot')), 
+             withSpinner(plotlyOutput(ns('time_series_plot')), type = 8, color = "#666666"), 
              uiOutput(ns("scaled_note")))
     )
   )
@@ -96,16 +97,6 @@ home_server <- function(input, output, session) {
     }
   })
   
-  # Show scaled or unscaled version of the habitat?
-  output$show_unscaled_ui <- renderUI({
-    req(input$species)
-    if (input$category == 'Habitat') {
-      checkboxInput(ns('show_unscaled'), 'Show Unscaled', value = FALSE)
-    } else {
-      NULL
-    }  })
-
-  
   output$data_type_input_ui <- renderUI({
     
     option <- metadata_lookup %>% 
@@ -120,20 +111,25 @@ home_server <- function(input, output, session) {
   output$species_input_ui <- renderUI({
     if (input$category == 'Habitat') {
       
-      tagList(
-        tags$div(style = "display:inline-block",
         selectInput(ns('species'), 'Select Species', 
                     choices = c('Fall Run', 'Spring Run', 'Winter Run', 'Steelhead'), 
-                    width = 150)),
-        tags$div(style = "display:inline-block",
-        checkboxInput(ns("show_unscaled"), "Show Habitat Unscaled", 
-                      value = F))
-      )
+                    width = 150)
       
     } else {
       NULL
     }
   })
+  
+  # Show scaled or unscaled version of the habitat?
+  output$show_unscaled_ui <- renderUI({
+    req(input$species)
+    if (input$category == 'Habitat') {
+      tags$div(style = "margin-top:33px",
+      checkboxInput(ns('show_unscaled'), 'Show Unscaled', value = FALSE))
+    } else {
+      NULL
+    }  })
+  
   
   output$region_name <- renderUI({
     tags$h3(input$region)
@@ -188,7 +184,7 @@ home_server <- function(input, output, session) {
     
     # deal with habitat scaled or unscaled plot
     if (input$category == "Habitat") {
-      req(input$species)
+      req(!is.null(input$show_unscaled))
       
       if (input$show_unscaled) {
         selected_dataset() %>% 
@@ -213,13 +209,13 @@ home_server <- function(input, output, session) {
   })
   
   output$scaled_note <- renderUI({
-    req(input$species)
     
     if (input$category == "Habitat") {
+      req(!is.null(input$show_unscaled))
       scaling_factor <- selected_dataset() %>% head(1) %>% pull(scale)
       if (!input$show_unscaled & scaling_factor != 1) {
         tags$p(tags$em("The original habitat modeling values were scaled by a factor of"),
-               tags$b(tags$em(scaling_factor)), 
+               tags$b(tags$em(round(scaling_factor, 2))), 
                tags$em("during the calibration process."))
       } else {
         NULL
