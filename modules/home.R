@@ -162,20 +162,20 @@ home_server <- function(input, output, session) {
         summary() %>% 
         broom::tidy() %>% 
         gather(stat, unscaled_value) %>% 
-        mutate(unscaled_value = paste(pretty_num(unscaled_value, 0), stat_label))
+        mutate(unscaled_value = paste(pretty_num(unscaled_value, 0)))
       
       scaled_summary <- selected_dataset() %>% 
         pull(scaled_habitat) %>% 
         summary() %>% 
         broom::tidy() %>% 
         gather(stat, scaled_value) %>% 
-        mutate(scaled_value = paste(pretty_num(scaled_value, 0), stat_label))
+        mutate(scaled_value = paste(pretty_num(scaled_value, 0)))
       
       full_summary <- left_join(unscaled_summary, scaled_summary) %>% 
         transmute(
           Stat = stat,
-          `Scaled Habitat` = scaled_value, 
-               `Original Habitat` = unscaled_value)
+          `Scaled Habitat (acres)` = scaled_value, 
+          `Original Habitat (acres)` = unscaled_value)
       
     } else {
       full_summary <- selected_dataset() %>% 
@@ -183,13 +183,19 @@ home_server <- function(input, output, session) {
         summary() %>% 
         broom::tidy() %>% 
         gather(stat, value) %>% 
-        mutate(value = paste(pretty_num(value, 0), stat_label))
+        mutate(value = paste(pretty_num(value, 0))) 
       
-      colnames(full_summary) <- NULL
+      col_names <- switch(input$category, 
+                          "Flow" = c("Stat", "Flow (cfs)"), 
+                          "Temperature" = c("Stat", "Temperature (°C)"), 
+                          "Habitat" = c("Stat", "Habitat (acres)"))
+      
+      colnames(full_summary) <- col_names
     }
     
     full_summary
-  }, colnames = TRUE)
+  })
+  
   
   
   output$time_series_plot <- renderPlotly({
