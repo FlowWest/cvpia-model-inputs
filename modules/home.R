@@ -175,7 +175,7 @@ home_server <- function(input, output, session) {
         transmute(
           Stat = stat,
           `Scaled Habitat` = scaled_value, 
-               `Unscaled Habitat` = unscaled_value)
+               `Original Habitat` = unscaled_value)
       
     } else {
       full_summary <- selected_dataset() %>% 
@@ -204,7 +204,7 @@ home_server <- function(input, output, session) {
       if (input$show_unscaled) {
         p <- p %>% 
           add_trace(x = ~date, y = ~value, 
-                    name = "Unscaled Habitat", 
+                    name = "Original Habitat", 
                     line = list(dash = "dot", color = pal[2]))
       }
         
