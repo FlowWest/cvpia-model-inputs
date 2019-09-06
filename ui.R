@@ -9,3 +9,4 @@ shinyUI(
     tabPanel('About', about_ui('app'))
   )
 )
+
