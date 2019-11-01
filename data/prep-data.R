@@ -199,7 +199,7 @@ spawning_habitat <- bind_rows(
 ) %>% 
   mutate(date = ymd(paste(year, month, 1, sep = '-')),
          value = sqm/4046.86, # suitable acres
-         data_type = 'Monthly Spawning Rearing Area') %>% 
+         data_type = 'Monthly Spawning Area') %>% 
   select(date, value, data_type, region = watershed, species)
 
 glimpse(spawning_habitat)
@@ -637,7 +637,7 @@ habitat_modified <- read_rds("data/habitat.rds") %>%
     type = case_when(
       data_type == "Monthly In-channel Rearing Area" ~ "Rearing", 
       data_type == "Monthly Rearing Area" ~ "Rearing", 
-      data_type == "Monthly Spawning Rearing Area" ~ "Spawning", 
+      data_type == "Monthly Spawning Area" ~ "Spawning", 
       TRUE ~ as.character(NA)
     )
   )
