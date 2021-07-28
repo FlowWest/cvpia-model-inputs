@@ -88,43 +88,43 @@ mutate(date = ymd(paste(year, month, 1, sep = '-')),
 
 # Monthly floodplain rearing habitat -------------------------------------------
 fr_fp_habitat <- map_df(1:20, function(i) {
-  cvpiaData::fr_fp[,,i] %>% 
+  DSMhabitat::fr_fp[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Fall Run")
 
 wr_fp_habitat <- map_df(1:20, function(i) {
-  cvpiaData::wr_fp[,,i] %>% 
+  DSMhabitat::wr_fp[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Winter Run")
 
 sr_fp_habitat <- map_df(1:20, function(i) {
-  cvpiaData::sr_fp[,,i] %>% 
+  DSMhabitat::sr_fp[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Spring Run")
 
 st_fp_habitat <- map_df(1:20, function(i) {
-  cvpiaData::st_fp[,,i] %>% 
+  DSMhabitat::st_fp[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb),
          species = "Steelhead")
 
 floodplain_habitat <- bind_rows(
