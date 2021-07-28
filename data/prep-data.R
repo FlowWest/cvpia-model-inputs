@@ -361,15 +361,18 @@ delta_flows <-
   select(date, region = delta_flow_type, value = flow_cfs, data_type)
 
 # monthly mean diverted --------------------------------------------------------
-
 watershed_monthly_mean_diverted <- 
-  cvpiaFlow::total_diverted %>% 
-  gather(watershed, total_diverted, -date) %>% 
-  mutate(data_type = "Monthly Mean Diverted") %>% 
+  DSMflow::total_diverted %>% 
+  reshape::melt() %>%
+  as.data.frame() %>%
+  setNames(c('watershed', 'month', 'year', 'total_diverted')) %>% 
+  mutate(month = match(month, month.abb), 
+         date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = "Monthly Mean Diverted") %>% 
   select(date, region = watershed, value = total_diverted, data_type)
 
 delta_monthly_mean_diverted <- 
-  cvpiaFlow::delta_flows %>% 
+  DSMflow::delta_flows %>% 
   select(date, 
          `South Delta` = s_dlt_div_cfs, 
          `North Delta` = n_dlt_div_cfs) %>% 
