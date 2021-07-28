@@ -290,7 +290,6 @@ st_juv_inchannel_habitat <- map_df(1:20, function(i) {
   mutate(month = match(month, month.abb), 
          species = "Steelhead")
 
-
 juv_inchannel_habitat <- bind_rows(
   fr_juv_inchannel_habitat, 
   wr_juv_inchannel_habitat,
@@ -337,16 +336,15 @@ write_rds(habitat, 'data/habitat.rds')
 
 # FLOW =========================================================================
 
-# monthly mean flow ---------------------------------
-
+# monthly mean flow ------------------------------------------------------------
 watershed_flows <- 
-  cvpiaFlow::flows_cfs %>% 
+  DSMflow::flows_cfs %>% 
   gather(watershed, flow_cfs, -date) %>% 
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = watershed, value = flow_cfs, data_type)
 
 bypass_flows <- 
-  cvpiaFlow::bypass_flows %>% 
+  DSMflow::bypass_flows %>% 
   select(date, `Sutter Bypass` = sutter4, `Yolo Bypass` = yolo2) %>% 
   gather(region, value, -date) %>% 
   mutate(data_type = "Monthly Mean Flow")
@@ -354,7 +352,7 @@ bypass_flows <-
 watershed_and_bypass_flows <- bind_rows(watershed_flows, bypass_flows)
 
 delta_flows <- 
-  cvpiaFlow::delta_flows %>% 
+  DSMflow::delta_flows %>% 
   select(date, 
          `North Delta` = n_dlt_inflow_cfs, 
          `South Delta` = s_dlt_inflow_cfs) %>% 
@@ -362,7 +360,7 @@ delta_flows <-
   mutate(data_type = "Monthly Mean Flow") %>% 
   select(date, region = delta_flow_type, value = flow_cfs, data_type)
 
-# monthly mean diverted --------------------------------
+# monthly mean diverted --------------------------------------------------------
 
 watershed_monthly_mean_diverted <- 
   cvpiaFlow::total_diverted %>% 
@@ -379,7 +377,7 @@ delta_monthly_mean_diverted <-
   mutate(data_type = "Monthly Mean Diverted") %>%
   select(date, region = watershed, value = total_diverted_cfs, data_type)
 
-# monthly mean proportion diverted ----------------------
+# monthly mean proportion diverted ---------------------------------------------
 
 # watershed 
 watershed_monthly_mean_prop_diverted <- 
