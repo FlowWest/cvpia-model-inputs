@@ -384,15 +384,18 @@ delta_monthly_mean_diverted <-
 
 # watershed 
 watershed_monthly_mean_prop_diverted <- 
-  cvpiaFlow::proportion_diverted %>% 
-  gather(watershed, proportion_diverted, -date) %>% 
-  mutate(data_type = "Monthly Mean Proportion Diverted") %>% 
-  select(date, region = watershed, value = proportion_diverted, 
-         data_type)
+  DSMflow::proportion_diverted %>% 
+  reshape::melt() %>%
+  as.data.frame() %>%
+  setNames(c('watershed', 'month', 'year', 'total_diverted')) %>% 
+  mutate(month = match(month, month.abb), 
+         date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = "Monthly Mean Diverted") %>% 
+  select(date, region = watershed, value = total_diverted, data_type)
 
 # delta
 delta_monthly_mean_prop_diverted <- 
-  cvpiaFlow::delta_flows %>% 
+  DSMflow::delta_flows %>% 
   select(date, 
          `South Delta` = s_dlt_prop_div, 
          `North Delta` = n_dlt_prop_div) %>% 
