@@ -196,45 +196,43 @@ glimpse(spawning_habitat)
 # Monthly fry inchannel --------------------------------------------------------
 
 fr_fry_inchannel_habitat <- map_df(1:20, function(i) {
-  cvpiaData::fr_fry[,,i] %>% 
+  DSMhabitat::fr_fry[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Fall Run")
 
-
 sr_fry_inchannel_habitat <- map_df(1:20, function(i) {
-  cvpiaData::sr_fry[,,i] %>% 
+  DSMhabitat::sr_fry[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Spring Run")
 
-
 wr_fry_inchannel_habitat <- map_df(1:20, function(i) {
-  cvpiaData::wr_fry[,,i] %>% 
+  DSMhabitat::wr_fry[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Winter Run")
 
 st_fry_inchannel_habitat <- map_df(1:20, function(i) {
-  cvpiaData::st_fry[,,i] %>% 
+  DSMhabitat::st_fry[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Steelhead")
 
 fry_inchannel_habitat <- bind_rows(
