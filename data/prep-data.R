@@ -52,40 +52,18 @@ delta_habitat <- bind_rows(
 
 # Bypass habitats -----------------
 # In channel
-sutter_ic_habitat <- cvpiaData::inchannel_bypass[1:4, ,] %>% 
-  colSums() %>% 
-  as.data.frame() %>% 
-  mutate(month = 1:12) %>% 
-  gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
-
-sutter_fp_habitat <- cvpiaData::floodplain_bypass[1:4, ,] %>% 
-  colSums() %>% 
-  as.data.frame() %>% 
-  mutate(month = 1:12) %>% 
-  gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
-
-sutter_habitat <- bind_rows(sutter_ic_habitat, sutter_fp_habitat) %>% 
+sutter_habitat <- DSMhabitat::sutter_habitat %>% 
+  reshape::melt() %>%
+  as.data.frame() %>%
+  setNames(c('month', 'year', 'sqm')) %>% 
   group_by(month, year) %>% 
   summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
   mutate(region = "Sutter Bypass")
 
-yolo_ic_habitat <- cvpiaData::inchannel_bypass[5:6, ,] %>% 
-  colSums() %>% 
-  as.data.frame() %>% 
-  mutate(month = 1:12) %>% 
-  gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
-
-yolo_fp_habitat <- cvpiaData::floodplain_bypass[5:6, ,] %>% 
-  colSums() %>% 
-  as.data.frame() %>% 
-  mutate(month = 1:12) %>% 
-  gather(year, sqm, -month) %>% 
-  mutate(year = as.numeric(str_extract(year, "[0-9]+")) + 1979) 
-
-yolo_habitat <- bind_rows(yolo_ic_habitat, yolo_fp_habitat) %>% 
+yolo_habitat <- DSMhabitat::yolo_habitat %>% 
+  reshape::melt() %>%
+  as.data.frame() %>%
+  setNames(c('month', 'year', 'sqm')) %>% 
   group_by(month, year) %>% 
   summarise(value = sum(sqm)/4046.86) %>% ungroup() %>% 
   mutate(region = "Yolo Bypass")
