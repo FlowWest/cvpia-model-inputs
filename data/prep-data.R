@@ -18,7 +18,7 @@ watershed_labels <- c("Upper Sacramento River", "Antelope Creek", "Battle Creek"
 # HABITAT ======================================================================
 
 # delta habitats 
-north_delta_habitat <- cvpiaData::dlt_hab[, , 1] %>%
+north_delta_habitat <- DSMhabitat::delta_habitat[, , 1] %>% 
   as.data.frame() %>% 
   mutate(month = 1:12) %>%
   gather(year, sqm, -month) %>% 
@@ -26,7 +26,7 @@ north_delta_habitat <- cvpiaData::dlt_hab[, , 1] %>%
          region = "North Delta", 
          value = sqm/4046.86)
   
-south_delta_habitat <- cvpiaData::dlt_hab[, , 2] %>%
+south_delta_habitat <- DSMhabitat::delta_habitat[, , 2] %>%
   as.data.frame() %>% 
   mutate(month = 1:12) %>%
   gather(year, sqm, -month) %>% 
