@@ -141,43 +141,43 @@ floodplain_habitat <- bind_rows(
 # Monthly spawning rearing habitat ---------------------------------------------
 
 fr_spawn_habitat <- map_df(1:20, function(i) {
-  cvpiaData::fr_spawn[,,i] %>% 
+  DSMhabitat::fr_spawn[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Fall Run")
 
 sr_spawn_habitat <- map_df(1:20, function(i) {
-  cvpiaData::sr_spawn[,,i] %>% 
+  DSMhabitat::sr_spawn[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Spring Run")
 
 wr_spawn_habitat <- map_df(1:20, function(i) {
-  cvpiaData::wr_spawn[,,i] %>% 
+  DSMhabitat::wr_spawn[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Winter Run")
 
 st_spawn_habitat <- map_df(1:20, function(i) {
-  cvpiaData::st_spawn[,,i] %>% 
+  DSMhabitat::st_spawn[,,i] %>% 
     as.data.frame() %>% 
     mutate(year = i + 1979) %>% 
-    bind_cols(watershed = cvpiaData::watershed_ordering$watershed)
+    bind_cols(watershed = watershed_labels)
 }) %>% 
   gather(month, sqm, -watershed, -year) %>% 
-  mutate(month = str_extract(month, "[0-9]+"), 
+  mutate(month = match(month, month.abb), 
          species = "Steelhead")
 
 spawning_habitat <- bind_rows(
