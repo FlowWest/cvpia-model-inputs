@@ -418,26 +418,48 @@ write_rds(flows, "data/flows.rds")
 
 # TEMPERATURE ==================================================================
 
-# monthly mean temp ----------------
+# monthly mean temp ------------------------------------------------------------
 
 # watershed 
 watershed_and_bypass_temperatures <- 
-  cvpiaTemperature::juv_temp %>% 
-  mutate(data_type = "Monthly Mean Temperature") %>% 
-  select(date, region = watershed, value = monthly_mean_temp_c, data_type)
+  map_df(1:20, function(i) {
+    DSMtemperature::stream_temperature[,,i] %>% 
+      as.data.frame() %>% 
+      mutate(year = i + 1979) %>% 
+      bind_cols(watershed = watershed_labels)
+  }) %>% 
+  gather(month, temp, -watershed, -year) %>% 
+  mutate(month = match(month, month.abb), 
+         date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = "Monthly Mean Temperature") %>% 
+  select(date, region = watershed, value = temp, data_type)
   
-
 # delta 
 delta_temperatures <- 
-  cvpiaTemperature::delta_temps %>% 
-  mutate(data_type = "Monthly Mean Temperature") %>% 
-  select(date, region = watershed, value = monthly_mean_temp_c, data_type)
+  map_df(1:2, function(i) {
+    DSMtemperature::delta_temperature[,,i] %>% 
+      reshape::melt() %>%
+      as.data.frame() %>%
+      setNames(c('month', 'year', 'temp')) %>%
+      mutate(watershed = ifelse(i == 1, "North Delta", "South Delta"))
+  }) %>% 
+  mutate(month = match(month, month.abb), 
+         date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = "Monthly Mean Temperature") %>% 
+  select(date, region = watershed, value = temp, data_type)
 
 # degree days ---------------------
-degree_days <- cvpiaTemperature::deg_days %>%
-  select(date, region = watershed, value = degdays) %>% 
-  mutate(data_type = "Degree Days")
-
+degree_days <- map_df(1:20, function(i) {
+  DSMtemperature::degree_days[,,i] %>% 
+    as.data.frame() %>% 
+    mutate(year = i + 1979) %>% 
+    bind_cols(watershed = watershed_labels)
+}) %>% 
+  gather(month, temp, -watershed, -year) %>% 
+  mutate(month = match(month, month.abb), 
+         date = ymd(paste(year, month, 1, sep = '-')),
+         data_type = "Degree Days") %>% 
+  select(date, region = watershed, value = temp, data_type)
 
 temperatures <- bind_rows(
   watershed_and_bypass_temperatures, 
@@ -445,8 +467,9 @@ temperatures <- bind_rows(
   degree_days
 )
 
-write_rds(temperatures, "data/temperatures.rds")
+glimpse(temperatures)
 
+write_rds(temperatures, "data/temperatures.rds")
 
 # Habitat Scaling Factors ------------------------------------------------------
 
