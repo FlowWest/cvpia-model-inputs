@@ -473,6 +473,8 @@ write_rds(temperatures, "data/temperatures.rds")
 
 # Habitat Scaling Factors ------------------------------------------------------
 
+# TODO Update scales here after new calibration produces new scales
+
 # Fall Run Scales
 # SPAWN
 # 1 Upper Sac
