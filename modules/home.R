@@ -28,8 +28,6 @@ home_ui <- function(id) {
       column(width = 7, 
              withSpinner(plotlyOutput(ns('time_series_plot')), type = 8, color = "#666666"), 
              uiOutput(ns("scaled_note"))), 
-      column(width = 2, 
-             uiOutput(ns('show_unscaled_ui')))
     )
   )
   
@@ -103,30 +101,6 @@ home_server <- function(input, output, session) {
     }
   })
   
-  # determine if the selected combination of data has a scaling factor
-  # this is used to determine when to show the checkbox and if to add an
-  # additional dashed line to the plot
-  data_has_scaling <- reactive({
-    if (input$category == "Habitat") {
-      scale <- selected_dataset() %>%
-        head(1) %>%
-        pull(scale)
-    } else {
-      scale <- 1
-    }
-
-    scale != 1
-  })
-
-  # Show scaled or unscaled version of the habitat?
-  output$show_unscaled_ui <- renderUI({
-    if (input$category == 'Habitat' & data_has_scaling()) {
-      tags$div(style = "margin-top:33px",
-      checkboxInput(ns('show_unscaled'), 'Show Unscaled', value = TRUE))
-    } else {
-      NULL
-    }  })
-  
   
   output$region_name <- renderUI({
     tags$h3(input$region)
@@ -155,30 +129,7 @@ home_server <- function(input, output, session) {
       filter(region == selected_region(), category == input$category, 
              data_type == input$data_type) %>% 
       pull(stat_label)
-    
-    # if (input$category == "Habitat" & data_has_scaling()) {
-    #   
-    #   unscaled_summary <- selected_dataset() %>% 
-    #     pull(value) %>% 
-    #     summary() %>% 
-    #     broom::tidy() %>% 
-    #     gather(stat, unscaled_value) %>% 
-    #     mutate(unscaled_value = paste(pretty_num(unscaled_value, 0)))
-    #   
-    #   scaled_summary <- selected_dataset() %>% 
-    #     pull(scaled_habitat) %>% 
-    #     summary() %>% 
-    #     broom::tidy() %>% 
-    #     gather(stat, scaled_value) %>% 
-    #     mutate(scaled_value = paste(pretty_num(scaled_value, 0)))
-    #   
-    #   full_summary <- left_join(unscaled_summary, scaled_summary) %>% 
-    #     transmute(
-    #       Stat = stat,
-    #       `Scaled Habitat (acres)` = scaled_value, 
-    #       `Original Habitat (acres)` = unscaled_value)
-    #   
-    # } else {
+
       full_summary <- selected_dataset() %>% 
         pull(value) %>% 
         summary() %>% 
@@ -192,7 +143,6 @@ home_server <- function(input, output, session) {
                           "Habitat" = c("Stat", "Habitat (acres)"))
       
       colnames(full_summary) <- col_names
-    # }
     
     full_summary
   })
@@ -201,14 +151,25 @@ home_server <- function(input, output, session) {
   
   output$time_series_plot <- renderPlotly({
     if (input$category == "Habitat" & input$data_type == "Monthly Floodplain Rearing Area") {
-      gg <- selected_dataset() %>%
-        arrange(date) %>% 
-        ggplot(aes(date, value, fill = weeks_flooded)) +
-        theme_minimal() + 
-        geom_col() +
-        guides(fill = guide_legend(title="Wks Fld")) + 
-        theme(legend.position = 'bottom')
-      p <- ggplotly(gg)
+      p <- selected_dataset() %>% filter(weeks_flooded == 1) %>%
+        plot_ly(x=~date, y=~value, type='bar', 
+                name = '1 weeks inundated',
+                color =  list(color = pal[1])) %>% 
+        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 2), 
+                  x=~date, 
+                  y=~value, 
+                  type='bar',
+                  name= '2 weeks inundated', 
+                  color =  list(color = pal[2])) %>% 
+        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 3), 
+                  x=~date, 
+                  y=~value, 
+                  type='bar', 
+                  name= '3 weeks inundated',
+                  color =  list(color = pal[3])) %>% 
+        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 4), x=~date, y=~value, type='bar', 
+                  name= '4 weeks inundated',
+                  color =  list(color = pal[4]))
 
      } else {
       p <- selected_dataset() %>% 
