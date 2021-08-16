@@ -71,7 +71,8 @@ home_server <- function(input, output, session) {
       df %>%
         filter(region == input$region, 
                species == input$species,
-               data_type == input$data_type)
+               data_type == input$data_type) %>%
+        na.omit()
     } else {
       df %>%
         filter(region == input$region, 
@@ -103,20 +104,20 @@ home_server <- function(input, output, session) {
   })
   
   # determine if the selected combination of data has a scaling factor
-  # this is used to determine when to show the checkbox and if to add an 
+  # this is used to determine when to show the checkbox and if to add an
   # additional dashed line to the plot
   data_has_scaling <- reactive({
     if (input$category == "Habitat") {
-      scale <- selected_dataset() %>% 
-        head(1) %>% 
+      scale <- selected_dataset() %>%
+        head(1) %>%
         pull(scale)
     } else {
       scale <- 1
     }
-    
-    scale != 1 
+
+    scale != 1
   })
-  
+
   # Show scaled or unscaled version of the habitat?
   output$show_unscaled_ui <- renderUI({
     if (input$category == 'Habitat' & data_has_scaling()) {
@@ -155,29 +156,29 @@ home_server <- function(input, output, session) {
              data_type == input$data_type) %>% 
       pull(stat_label)
     
-    if (input$category == "Habitat" & data_has_scaling()) {
-      
-      unscaled_summary <- selected_dataset() %>% 
-        pull(value) %>% 
-        summary() %>% 
-        broom::tidy() %>% 
-        gather(stat, unscaled_value) %>% 
-        mutate(unscaled_value = paste(pretty_num(unscaled_value, 0)))
-      
-      scaled_summary <- selected_dataset() %>% 
-        pull(scaled_habitat) %>% 
-        summary() %>% 
-        broom::tidy() %>% 
-        gather(stat, scaled_value) %>% 
-        mutate(scaled_value = paste(pretty_num(scaled_value, 0)))
-      
-      full_summary <- left_join(unscaled_summary, scaled_summary) %>% 
-        transmute(
-          Stat = stat,
-          `Scaled Habitat (acres)` = scaled_value, 
-          `Original Habitat (acres)` = unscaled_value)
-      
-    } else {
+    # if (input$category == "Habitat" & data_has_scaling()) {
+    #   
+    #   unscaled_summary <- selected_dataset() %>% 
+    #     pull(value) %>% 
+    #     summary() %>% 
+    #     broom::tidy() %>% 
+    #     gather(stat, unscaled_value) %>% 
+    #     mutate(unscaled_value = paste(pretty_num(unscaled_value, 0)))
+    #   
+    #   scaled_summary <- selected_dataset() %>% 
+    #     pull(scaled_habitat) %>% 
+    #     summary() %>% 
+    #     broom::tidy() %>% 
+    #     gather(stat, scaled_value) %>% 
+    #     mutate(scaled_value = paste(pretty_num(scaled_value, 0)))
+    #   
+    #   full_summary <- left_join(unscaled_summary, scaled_summary) %>% 
+    #     transmute(
+    #       Stat = stat,
+    #       `Scaled Habitat (acres)` = scaled_value, 
+    #       `Original Habitat (acres)` = unscaled_value)
+    #   
+    # } else {
       full_summary <- selected_dataset() %>% 
         pull(value) %>% 
         summary() %>% 
@@ -191,7 +192,7 @@ home_server <- function(input, output, session) {
                           "Habitat" = c("Stat", "Habitat (acres)"))
       
       colnames(full_summary) <- col_names
-    }
+    # }
     
     full_summary
   })
@@ -199,28 +200,22 @@ home_server <- function(input, output, session) {
   
   
   output$time_series_plot <- renderPlotly({
-    if (input$category == "Habitat" & data_has_scaling()) {
-      req(length(input$show_unscaled) > 0)
-      p <- selected_dataset() %>% 
+    if (input$category == "Habitat" & input$data_type == "Monthly Floodplain Rearing Area") {
+      gg <- selected_dataset() %>%
         arrange(date) %>% 
-        plot_ly(x = ~date, y = ~scaled_habitat, type = "scatter", mode = "lines", 
-                name = "Scaled Habitat",
-                line = list(color = pal[1])) 
-      
-      if (input$show_unscaled) {
-        p <- p %>% 
-          add_trace(x = ~date, y = ~value, 
-                    name = "Original Habitat", 
-                    line = list(dash = "dot", color = pal[2]))
-      }
-        
-      
-    } else {
+        ggplot(aes(date, value, fill = weeks_flooded)) +
+        theme_minimal() + 
+        geom_col() +
+        guides(fill = guide_legend(title="Wks Fld")) + 
+        theme(legend.position = 'bottom')
+      p <- ggplotly(gg)
+
+     } else {
       p <- selected_dataset() %>% 
         arrange(date) %>% 
         plot_ly(x=~date, y=~value, type='scatter', mode='lines', 
                 line = list(color = pal[1])) 
-    }
+     }
     
     # return
     p %>% 
@@ -230,12 +225,12 @@ home_server <- function(input, output, session) {
   
   # show this note only when the data has scaling but regardless of whether 
   # the checkbox is checked or not
-  output$scaled_note <- renderUI({
-    if (input$category == "Habitat" & data_has_scaling()) {
-      scaling_factor <- selected_dataset() %>% head(1) %>% pull(scale) %>% round(2)
-      tags$p(tags$em("The original habitat modeling values were scaled by a factor of", 
-                     tags$b(scaling_factor), "during the calibration process."))
-    }
-  })
+  # output$scaled_note <- renderUI({
+  #   if (input$category == "Habitat" & data_has_scaling()) {
+  #     scaling_factor <- selected_dataset() %>% head(1) %>% pull(scale) %>% round(2)
+  #     tags$p(tags$em("The original habitat modeling values were scaled by a factor of", 
+  #                    tags$b(scaling_factor), "during the calibration process."))
+  #   }
+  # })
   
 }

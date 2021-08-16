@@ -23,7 +23,7 @@ flows <- read_rds('data/flows.rds') %>%
   filter(year(date) %in% 1980:1999)
 temperatures <- read_rds('data/temperatures.rds') %>% 
   filter(year(date) %in% 1980:1999)
-habitat <- read_rds("data/habitat_with_scales.rds") %>% 
+habitat <- read_rds("data/habitat.rds") %>% 
   filter(year(date) %in% 1980:1999)
 
 pretty_num <- function(num, places = 2) {
