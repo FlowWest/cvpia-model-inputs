@@ -151,25 +151,23 @@ home_server <- function(input, output, session) {
   
   output$time_series_plot <- renderPlotly({
     if (input$category == "Habitat" & input$data_type == "Monthly Floodplain Rearing Area") {
-      p <- selected_dataset() %>% filter(weeks_flooded == 1) %>%
-        plot_ly(x=~date, y=~value, type='bar', 
-                name = '1 weeks inundated',
-                color =  list(color = pal[1])) %>% 
-        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 2), 
+      filtered_hab <- selected_dataset() %>%
+        mutate(weeks_flooded = case_when(
+          weeks_flooded == 1 ~ "1 weeks inundated",
+          weeks_flooded == 2 ~ "2 weeks inundated",
+          weeks_flooded == 3 ~ "3 weeks inundated",
+          weeks_flooded == 4 ~ "4 weeks inundated"
+        )) %>% na.omit()
+      
+      p <- filtered_hab %>%
+           plot_ly() %>% 
+           add_trace(data = filtered_hab, 
                   x=~date, 
                   y=~value, 
                   type='bar',
-                  name= '2 weeks inundated', 
-                  color =  list(color = pal[2])) %>% 
-        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 3), 
-                  x=~date, 
-                  y=~value, 
-                  type='bar', 
-                  name= '3 weeks inundated',
-                  color =  list(color = pal[3])) %>% 
-        add_trace(data = selected_dataset() %>% filter(weeks_flooded == 4), x=~date, y=~value, type='bar', 
-                  name= '4 weeks inundated',
-                  color =  list(color = pal[4]))
+                  color = ~weeks_flooded,
+                  colors = pal) %>% 
+        layout(showlegend=T)
 
      } else {
       p <- selected_dataset() %>% 
